@@ -1,0 +1,44 @@
+# =============== Unity ===============
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Mm]emoryCaptures/
+UserSettings/
+
+# Crash reports
+sysinfo.txt
+*.stackdump
+
+# =============== VS / Rider ===============
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+.vscode/
+
+# Keep solution and project files (others need them!)
+# *.csproj
+# *.sln
+
+# =============== OS ===============
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# =============== Other ===============
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
