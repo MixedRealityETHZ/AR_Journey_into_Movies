@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 790419131541493696}
   - component: {fileID: 1834774596723584917}
   - component: {fileID: 1962856677446314255}
-  - component: {fileID: 3891883112355155008}
+  - component: {fileID: 1505599133102749457}
   m_Layer: 0
   m_Name: Frustum
   m_TagString: Untagged
@@ -59,15 +59,10 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 110fb77aee8191e45b3e38b87f3bd4bb, type: 2}
+  - {fileID: 2100000, guid: 8713d5f18cb544d20948bdcbfe4a6360, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -85,12 +80,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &3891883112355155008
+--- !u!114 &1505599133102749457
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -101,7 +95,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 337271ad21a698e4ba1e1b1b0b7226e3, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ARJourneyIntoMovies.AR.FrustumBuilder
-  frustumLength: 2
-  wireframe: 1
+  m_EditorClassIdentifier: 
+  frustumLength: 1
+  wireframe: 0
   lineThickness: 0.02
