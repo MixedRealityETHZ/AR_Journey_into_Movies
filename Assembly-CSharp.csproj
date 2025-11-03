@@ -75,6 +75,7 @@
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/ARTemplateMenuManager.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/ARFeatheredPlaneMeshVisualizerCompanion.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/GuidanceTest.cs" />
+    <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/ARFrameUploaderV2.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/GoalManager.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/UI/CanvasHUD.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/FrustumDebugPanel.cs" />

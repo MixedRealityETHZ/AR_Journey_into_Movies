@@ -256,30 +256,25 @@ namespace ARJourneyIntoMovies.AR
             // 保存手动姿态
             targetPoseInARWorld = manualPose;
 
-            // 同步生成 PoseData（带平移、旋转、FOV）
+            Quaternion q = MatrixHelper.GetRotation(manualPose);
+            Vector3 t = MatrixHelper.GetPosition(manualPose);
+
             PoseData manualData = new PoseData
             {
                 success = true,
-                translation = new float[] {
-                    manualPose.m03,
-                    manualPose.m13,
-                    manualPose.m23
-                },
-                rotation = new float[] {
-                    MatrixHelper.GetRotation(manualPose).x,
-                    MatrixHelper.GetRotation(manualPose).y,
-                    MatrixHelper.GetRotation(manualPose).z,
-                    MatrixHelper.GetRotation(manualPose).w
-                },
-                fov = 60f,   // 给一个默认视角
+                rotation = new float[] { q.w, q.x, q.y, q.z }, // ✅ w,x,y,z
+                translation = new float[] { t.x, t.y, t.z },
+                fov = 60f,
                 aspect = 16f / 9f,
                 movie_frame_id = "manual_input",
                 confidence = 1.0f
             };
 
-            lastServerPose = manualData; // ✅ 缓存为上一个 pose
-            isDeltaTCalculated = true;   // ✅ 防止 identity 触发
-            Debug.Log("[PoseFusion] SetManualPose - manual pose injected.");
+            lastServerPose = manualData;
+            isDeltaTCalculated = true;
+
+            Debug.Log($"[PoseFusion] SetManualPose - manual pose injected. " +
+                    $"Pos=({t.x:F2},{t.y:F2},{t.z:F2}), Rot=({q.eulerAngles})");
 
             // 通知所有监听者
             OnPoseUpdated?.Invoke(manualData);
