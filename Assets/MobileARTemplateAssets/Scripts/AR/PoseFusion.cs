@@ -36,6 +36,8 @@ namespace ARJourneyIntoMovies.AR
 
         // Current AR camera pose (in AR world space)
         private Matrix4x4 currentARCameraPose = Matrix4x4.identity;
+        // Target pose in AR world (cached for visualization)
+        private Matrix4x4 targetPoseInARWorld = Matrix4x4.identity;
 
         // AR camera pose at the time of query (used for ΔT calculation)
         private Matrix4x4 arCameraPoseAtQuery = Matrix4x4.identity;
@@ -248,5 +250,41 @@ namespace ARJourneyIntoMovies.AR
         {
             return isDeltaTCalculated;
         }
+
+        public void SetManualPose(Matrix4x4 manualPose)
+        {
+            // 保存手动姿态
+            targetPoseInARWorld = manualPose;
+
+            // 同步生成 PoseData（带平移、旋转、FOV）
+            PoseData manualData = new PoseData
+            {
+                success = true,
+                translation = new float[] {
+                    manualPose.m03,
+                    manualPose.m13,
+                    manualPose.m23
+                },
+                rotation = new float[] {
+                    MatrixHelper.GetRotation(manualPose).x,
+                    MatrixHelper.GetRotation(manualPose).y,
+                    MatrixHelper.GetRotation(manualPose).z,
+                    MatrixHelper.GetRotation(manualPose).w
+                },
+                fov = 60f,   // 给一个默认视角
+                aspect = 16f / 9f,
+                movie_frame_id = "manual_input",
+                confidence = 1.0f
+            };
+
+            lastServerPose = manualData; // ✅ 缓存为上一个 pose
+            isDeltaTCalculated = true;   // ✅ 防止 identity 触发
+            Debug.Log("[PoseFusion] SetManualPose - manual pose injected.");
+
+            // 通知所有监听者
+            OnPoseUpdated?.Invoke(manualData);
+        }
+
+        
     }
 }
