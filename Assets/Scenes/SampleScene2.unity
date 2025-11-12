@@ -160,7 +160,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 678469876b2ee4c56a1c33be5217eb9f, type: 2}
+  - {fileID: 2100000, guid: 110fb77aee8191e45b3e38b87f3bd4bb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3589,7 +3589,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ARJourneyIntoMovies.AR.PoseFusion
   serverClient: {fileID: 1882041699}
   arCamera: {fileID: 1553500800}
-  autoCalculateDeltaT: 1
+  autoCalculateDeltaT: 0
   showDebugInfo: 1
 --- !u!4 &774811789
 Transform:
@@ -7558,10 +7558,6 @@ MonoBehaviour:
   toggleFollowButton: {fileID: 1680272752}
   applyPoseButton: {fileID: 1630104083}
   modeLabel: {fileID: 89430785}
-  followCameraRotation: 1
-  timer: 0
-  currentRotation: {x: 0, y: 0, z: 0, w: 1}
-  currentTranslation: {x: 0, y: 0, z: 0}
 --- !u!1 &1680272750
 GameObject:
   m_ObjectHideFlags: 0
@@ -8277,6 +8273,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a5e6b8fd771445469ffd7696eb5cab9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ARJourneyIntoMovies.Server.ServerClient
+  hudPanel: {fileID: 469460193}
+  debugPosePanel: {fileID: 1644113335}
   serverUrl: http://192.168.220.78:5000/localize
   jpegQuality: 85
   timeoutSeconds: 10
