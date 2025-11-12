@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Text;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Networking;
+using ARJourneyIntoMovies.AR;
 
 namespace ARJourneyIntoMovies.Server
 {
@@ -12,6 +14,9 @@ namespace ARJourneyIntoMovies.Server
     /// </summary>
     public class ServerClient : MonoBehaviour
     {
+        [Header("UI References")]
+        public GameObject hudPanel;
+        public GameObject debugPosePanel;
         [Header("Server Configuration")]
         [Tooltip("URL of the localization server")]
         public string serverUrl = "http://localhost:5000/localize";
@@ -115,20 +120,47 @@ namespace ARJourneyIntoMovies.Server
         /// </summary>
         public void TriggerMockResponse()
         {
-            Debug.Log("[ServerClient] Triggering mock response");
+            Debug.Log("[ServerClient] Starting interactive mock mode");
 
-            PoseData mockData = new PoseData
+            // 1️⃣ 隐藏 HUD，显示调试面板
+            if (hudPanel != null) hudPanel.SetActive(false);
+            if (debugPosePanel != null) debugPosePanel.SetActive(true);
+
+            // 2️⃣ 查找 FrustumPoseARController（放在 DebugPosePanel 或挂载在 Frustum 对象上）
+            FrustumPoseARController controller = FindObjectOfType<FrustumPoseARController>();
+            if (controller == null)
             {
-                success = true,
-                rotation = new float[] { 1f, 0f, 0f, 0f }, // w, x, y, z (identity rotation)
-                translation = new float[] { 0f, 0f, 2f },   // x, y, z (2m forward)
-                fov = 60f,
-                aspect = 16f / 9f,
-                movie_frame_id = "mock_frame_001",
-                confidence = 0.95f
+                Debug.LogError("[ServerClient] FrustumPoseARController not found in scene!");
+                return;
+            }
+
+            // 3️⃣ 绑定按钮事件
+            Button backButton = GameObject.Find("Button_Back")?.GetComponent<Button>();
+            if (backButton != null)
+            {
+                backButton.onClick.RemoveAllListeners();
+                backButton.onClick.AddListener(() =>
+                {
+                    // 退出调试面板
+                    if (debugPosePanel != null) debugPosePanel.SetActive(false);
+                    if (hudPanel != null) hudPanel.SetActive(true);
+
+                    // 停止自动更新
+                    controller.enabled = false;
+
+                    Debug.Log("[ServerClient] Exiting mock mode, returning to HUD.");
+                });
+            }
+
+            // 4️⃣ 连接 Pose 输出（把相机或输入的姿态传给 OnPoseReceived）
+            controller.OnPoseUpdated = (poseData) =>
+            {
+                OnPoseReceived?.Invoke(poseData);
             };
 
-            OnPoseReceived?.Invoke(mockData);
+            // 5️⃣ 启用控制器
+            controller.enabled = true;
+            Debug.Log("[ServerClient] DebugPosePanel active, FrustumPoseARController running.");
         }
     }
 }

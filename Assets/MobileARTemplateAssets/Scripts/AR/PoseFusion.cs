@@ -20,7 +20,7 @@ namespace ARJourneyIntoMovies.AR
 
         [Header("Settings")]
         [Tooltip("Auto-calculate ΔT on first pose received")]
-        public bool autoCalculateDeltaT = true;
+        public bool autoCalculateDeltaT = false;
 
         [Header("Debug")]
         [SerializeField] private bool showDebugInfo = true;
@@ -41,7 +41,7 @@ namespace ARJourneyIntoMovies.AR
         private Matrix4x4 arCameraPoseAtQuery = Matrix4x4.identity;
 
         // Is ΔT calculated?
-        private bool isDeltaTCalculated = false;
+        private bool isDeltaTCalculated = true;
 
         private void Awake()
         {

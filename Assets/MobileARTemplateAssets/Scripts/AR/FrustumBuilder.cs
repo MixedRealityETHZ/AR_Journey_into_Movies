@@ -14,7 +14,7 @@ namespace ARJourneyIntoMovies.AR
         public float frustumLength = 2f;
 
         [Tooltip("Whether to build wireframe or solid frustum")]
-        public bool wireframe = true;
+        public bool wireframe = false;
 
         [Tooltip("Line thickness for wireframe mode")]
         public float lineThickness = 0.02f;
