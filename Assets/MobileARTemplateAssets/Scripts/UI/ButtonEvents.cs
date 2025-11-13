@@ -47,10 +47,10 @@ namespace ARJourneyIntoMovies.UI
 
             // Use dummy texture for testing (both Editor and Device)
             // TODO: Later replace with actual ARCameraManager.TryAcquireLatestCpuImage() or image picker
-            Debug.Log("[ButtonEvents] Using dummy image for testing");
-            Texture2D dummyTexture = CreateDummyTexture(1920, 1080);
-            Vector4 dummyIntrinsics = new Vector4(1000f, 1000f, 960f, 540f); // fx, fy, cx, cy
-            StartCoroutine(serverClient.SendQueryImage(dummyTexture, dummyIntrinsics));
+            // Debug.Log("[ButtonEvents] Using dummy image for testing");
+            // Texture2D dummyTexture = CreateDummyTexture(1920, 1080);
+            // Vector4 dummyIntrinsics = new Vector4(1000f, 1000f, 960f, 540f); // fx, fy, cx, cy
+            // StartCoroutine(serverClient.SendQueryImage(dummyTexture, dummyIntrinsics));
         }
 
         /// <summary>

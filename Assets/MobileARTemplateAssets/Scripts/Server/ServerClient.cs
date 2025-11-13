@@ -6,6 +6,20 @@ using UnityEngine.Networking;
 
 namespace ARJourneyIntoMovies.Server
 {
+    [Serializable]
+    public class SessionPose
+    {
+        public float[] translation;
+        public float[] rotation_xyzw;
+    }
+
+    [Serializable]
+    public class LocalizeResponse
+    {
+        public bool success;
+        public SessionPose session_pose;
+    }
+
     /// <summary>
     /// Client for communicating with HLoc server (localization service)
     /// Sends camera images and intrinsics via HTTP POST and receives pose data
@@ -14,7 +28,7 @@ namespace ARJourneyIntoMovies.Server
     {
         [Header("Server Configuration")]
         [Tooltip("URL of the localization server")]
-        public string serverUrl = "http://localhost:5000/localize";
+        public string serverUrl = "http://10.5.111.194:5000/localize";
 
         [Header("Request Settings")]
         [Tooltip("JPEG quality for image compression (0-100)")]
@@ -33,6 +47,50 @@ namespace ARJourneyIntoMovies.Server
             Debug.Log($"[ServerClient] Initialized with server URL: {serverUrl}");
         }
 
+        
+        public void ProcessServerResponse(string json)
+        {
+            Debug.Log("[ServerClient] Received response: " + json);
+
+            LocalizeResponse raw;
+            try
+            {
+                raw = JsonUtility.FromJson<LocalizeResponse>(json);
+            }
+            catch (Exception e)
+            {
+                OnError?.Invoke("JSON parse failed: " + e.Message);
+                return;
+            }
+
+            if (!raw.success)
+            {
+                OnError?.Invoke("Server returned success=false");
+                return;
+            }
+
+            // Build PoseData for your project
+            PoseData pose = new PoseData();
+            pose.success = true;
+
+            // ----- rotation: convert xyzw → wxyz -----
+            float[] r = raw.session_pose.rotation_xyzw;
+            pose.rotation = new float[] { r[0], r[1], r[2], r[3] }; 
+            // w = r[3]
+
+            // ----- translation: copy -----
+            pose.translation = raw.session_pose.translation;
+
+            // Optional: export confidence/fov if needed
+            pose.confidence = 1.0f;
+            pose.fov = 60;
+            pose.aspect = 16f / 9f;
+            pose.movie_frame_id = "film";
+
+            Debug.Log($"[ServerClient] Final PoseData → T={pose.GetTranslation()}, R={pose.GetRotation().eulerAngles}");
+
+            OnPoseReceived?.Invoke(pose);
+        }
         /// <summary>
         /// Send query image to server for localization
         /// </summary>
