@@ -153,6 +153,21 @@ namespace ARJourneyIntoMovies.AR
 
             Debug.Log("[OverlayManager] Overlay shown with placeholder texture");
         }
+        public void ShowOverlayWithTestPhoto()
+        {
+            // Load test image from Resources folder
+            Texture2D photo = Resources.Load<Texture2D>("test_frame");
+
+            if (photo == null)
+            {
+                Debug.LogError("[OverlayManager] Failed to load test_frame.jpg from Resources!");
+                return;
+            }
+
+            ShowOverlay(photo, defaultAlpha);
+
+            Debug.Log("[OverlayManager] Overlay shown with REAL test photo");
+        }
 
         /// <summary>
         /// Hide overlay and return to guidance mode
