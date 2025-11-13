@@ -6,191 +6,193 @@ using UnityEngine.Networking;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using Unity.Collections;
-[Serializable] public class ImageSize { public int width; public int height; }
-[Serializable] public class Intrinsics { public float fx, fy, cx, cy; public string model; }
-[Serializable] public class Notes { public bool mirrorY_applied; public string coord; }
-[Serializable]
-public class Payload
+using ARJourneyIntoMovies.Server;
+
+namespace ARJourneyIntoMovies.Server
 {
-    public long timestamp_ms;
-    public float[] rotation_xyzw;   // Rwc: [x,y,z,w]
-    public float[] translation_m;   // camera center C: [tx,ty,tz]
-    public ImageSize image_size;
-    public Intrinsics intrinsics;
-    public Notes notes;
-}
-
-
-
-[RequireComponent(typeof(ARCameraManager))]
-public class ARFrameUploaderV2 : MonoBehaviour
-{
-    [SerializeField] private ARCameraManager cameraManager;
-    [SerializeField] private float captureInterval = 3f;
-    [SerializeField] private string serverUrl = "http://192.168.8.109:5000/upload";
-
-    // down stream (server / SfM£©use OpenCV/+Z coordinate
-    [SerializeField] private bool convertToOpenCVCamera = false;
-
-    private float timer = 0f;
-
-    void Awake()
+    [Serializable] public class ImageSize { public int width; public int height; }
+    [Serializable] public class Intrinsics { public float fx, fy, cx, cy; public string model; }
+    [Serializable] public class Notes { public bool mirrorY_applied; public string coord; }
+    [Serializable]
+    public class Payload
     {
-        if (cameraManager == null)
-            cameraManager = GetComponent<ARCameraManager>();
+        public long timestamp_ms;
+        public float[] rotation_xyzw;   // Rwc: [x,y,z,w]
+        public float[] translation_m;   // camera center C: [tx,ty,tz]
+        public ImageSize image_size;
+        public Intrinsics intrinsics;
+        public Notes notes;
     }
 
-    void Update()
+    [RequireComponent(typeof(ARCameraManager))]
+    public class ARFrameUploaderV2 : MonoBehaviour
     {
-        timer += Time.deltaTime;
-        if (timer >= captureInterval)
+        [SerializeField] private ARCameraManager cameraManager;
+        [SerializeField] private float captureInterval = 3f;
+        [SerializeField] public ServerClient serverClient; 
+        [SerializeField] private string serverUrl;
+
+        // down stream (server / SfMï¿½ï¿½use OpenCV/+Z coordinate
+        [SerializeField] private bool convertToOpenCVCamera = false;
+
+        private float timer = 0f;
+
+        void Awake()
         {
-            timer = 0f;
-            if (verboseLog) Debug.Log($"[ARFU] tick ¡ª try capture (interval={captureInterval}s)");
-            StartCoroutine(CaptureAndUpload());
+            if (cameraManager == null)
+                cameraManager = GetComponent<ARCameraManager>();
+        }
+
+        void Update()
+        {
+            timer += Time.deltaTime;
+            if (timer >= captureInterval)
+            {
+                timer = 0f;
+                if (verboseLog) Debug.Log($"[ARFU] tick ï¿½ï¿½ try capture (interval={captureInterval}s)");
+                StartCoroutine(CaptureAndUpload());
+            }
+        }
+
+        [SerializeField] private bool verboseLog = true; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ï¿½ï¿½ï¿½ï¿½
+        void OnEnable()
+        {
+            // ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ frameReceived Ò²Ã»ï¿½ï¿½Ïµï¿½ï¿½ï¿½ãµ±Ç°ï¿½ï¿½ï¿½ï¿½ Update ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½Ô¼ï¿½
+            try
+            {
+                var baseUrl = serverUrl;
+                var i = baseUrl.LastIndexOf("/upload");
+                if (i > 0) baseUrl = baseUrl.Substring(0, i);
+                StartCoroutine(PingServer(baseUrl + "/ping"));
+            }
+            catch (System.Exception e)
+            {
+                if (verboseLog) Debug.LogWarning("[ARFU] Build ping URL failed: " + e.Message);
+            }
+        }
+
+        private IEnumerator PingServer(string url)
+        {
+            if (verboseLog) Debug.Log("[ARFU] Pinging " + url);
+            using (UnityWebRequest www = UnityWebRequest.Get(url))
+            {
+                yield return www.SendWebRequest();
+                if (www.result != UnityWebRequest.Result.Success)
+                    Debug.LogError("[ARFU] Ping failed: " + www.error);
+                else if (verboseLog)
+                    Debug.Log("[ARFU] Ping ok: " + www.downloadHandler.text);
+            }
+        }
+
+        private IEnumerator CaptureAndUpload()
+        {
+            // 0) ARSession ×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½Ö±ï¿½Ó·ï¿½ï¿½Ø£ï¿½
+            if (ARSession.state <= ARSessionState.Ready)
+            {
+                if (verboseLog) Debug.LogWarning($"[ARFU] ARSession not tracking yet: {ARSession.state}");
+                yield break;
+            }
+
+            // 1) CPU Í¼ï¿½ï¿½
+            if (!cameraManager.TryAcquireLatestCpuImage(out XRCpuImage image))
+            {
+                Debug.LogWarning("[ARFU] TryAcquireLatestCpuImage = false (no CPU image available)");
+                yield break;
+            }
+
+            if (verboseLog) Debug.Log($"[ARFU] Got CPU image: {image.width}x{image.height}");
+
+            var conversionParams = new XRCpuImage.ConversionParams
+            {
+                inputRect = new RectInt(0, 0, image.width, image.height),
+                outputDimensions = new Vector2Int(image.width, image.height),
+                outputFormat = TextureFormat.RGBA32,
+                //transformation = XRCpuImage.Transformation.MirrorY // ï¿½ï¿½Ö±ï¿½ï¿½×ª
+                transformation = XRCpuImage.Transformation.None
+            };
+
+            int size = image.GetConvertedDataSize(conversionParams);
+            var buffer = new NativeArray<byte>(size, Allocator.Temp);
+            image.Convert(conversionParams, buffer);
+            int width = image.width;
+            int height = image.height;
+            image.Dispose();
+
+            var texture = new Texture2D(width, height, TextureFormat.RGBA32, false);
+            texture.LoadRawTextureData(buffer);
+            texture.Apply();
+            buffer.Dispose();
+
+            // 2) Î»ï¿½Ë£ï¿½cameraï¿½ï¿½worldï¿½ï¿½
+            var cam = cameraManager.GetComponent<Camera>().transform;
+            Quaternion qUnity = cam.rotation;
+            Vector3 tUnity = cam.position;
+
+            if (convertToOpenCVCamera)
+                qUnity = qUnity * Quaternion.Euler(0f, 180f, 0f);
+
+            float[] rot_xyzw = new float[] { qUnity.x, qUnity.y, qUnity.z, qUnity.w };
+            float[] pos_m = new float[] { tUnity.x, tUnity.y, tUnity.z };
+
+            // 3) ï¿½Ú²ï¿½
+            float fx = 0, fy = 0, cx = 0, cy = 0;
+            int intrW = width, intrH = height;
+            if (cameraManager.TryGetIntrinsics(out XRCameraIntrinsics intr))
+            {
+                fx = intr.focalLength.x;
+                fy = intr.focalLength.y;
+                cx = intr.principalPoint.x;
+                cy = intr.principalPoint.y;
+                intrW = intr.resolution.x;
+                intrH = intr.resolution.y;
+            }
+
+            if (intrW != width || intrH != height)
+            {
+                float sx = (float)width / intrW;
+                float sy = (float)height / intrH;
+                fx *= sx; fy *= sy;
+                cx *= sx; cy *= sy;
+            }
+
+            float cy_flipped = (height - 1) - cy;
+
+            // 4) ï¿½ï¿½ JSON
+            long ts_ms = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            var payload = new Payload
+            {
+                timestamp_ms = ts_ms,
+                rotation_xyzw = rot_xyzw,
+                translation_m = pos_m,
+                image_size = new ImageSize { width = width, height = height },
+                intrinsics = new Intrinsics { fx = fx, fy = fy, cx = cx, cy = cy_flipped, model = "pinhole" },
+                notes = new Notes { mirrorY_applied = true, coord = convertToOpenCVCamera ? "OpenCV(+Z forward)" : "Unity(+Z forward)" }
+            };
+            string json = JsonUtility.ToJson(payload);
+
+            // 5) ï¿½Ï´ï¿½
+            byte[] imageBytes = texture.EncodeToPNG();
+            Destroy(texture);
+
+            var form = new WWWForm();
+            form.AddBinaryData("image", imageBytes, $"frame_{payload.timestamp_ms}.png", "image/png");
+            form.AddField("meta_json", json);
+
+            if (verboseLog) Debug.Log("[ARFU] POST " + serverUrl);
+            using (UnityWebRequest www = UnityWebRequest.Post(serverUrl, form))
+            {
+                //www.chunkedTransfer = false;  
+                www.timeout = 10;              
+                www.SetRequestHeader("Connection", "close"); 
+
+                yield return www.SendWebRequest();
+
+                if (www.result != UnityWebRequest.Result.Success)
+                    Debug.LogError("[ARFU] Upload failed: " + www.error + " (code=" + www.responseCode + ")");
+                else
+                    Debug.Log($"[ARFU] Uploaded #{ts_ms}, size=({width}x{height})");
+                    serverClient.ProcessServerResponse(www.downloadHandler.text);
+            }
         }
     }
-
-    [SerializeField] private bool verboseLog = true; // µ÷ÊÔÈÕÖ¾¿ª¹Ø
-    void OnEnable()
-    {
-        // ¶©ÔÄ²»µ½ frameReceived Ò²Ã»¹ØÏµ£¨Äãµ±Ç°ÊÇÓÃ Update ¶¨Ê±Æ÷£©£¬ÕâÀïÖ»×öÍøÂçÁ¬Í¨×Ô¼ì
-        try
-        {
-            var baseUrl = serverUrl;
-            var i = baseUrl.LastIndexOf("/upload");
-            if (i > 0) baseUrl = baseUrl.Substring(0, i);
-            StartCoroutine(PingServer(baseUrl + "/ping"));
-        }
-        catch (System.Exception e)
-        {
-            if (verboseLog) Debug.LogWarning("[ARFU] Build ping URL failed: " + e.Message);
-        }
-    }
-
-    private IEnumerator PingServer(string url)
-    {
-        if (verboseLog) Debug.Log("[ARFU] Pinging " + url);
-        using (UnityWebRequest www = UnityWebRequest.Get(url))
-        {
-            yield return www.SendWebRequest();
-            if (www.result != UnityWebRequest.Result.Success)
-                Debug.LogError("[ARFU] Ping failed: " + www.error);
-            else if (verboseLog)
-                Debug.Log("[ARFU] Ping ok: " + www.downloadHandler.text);
-        }
-    }
-
-    private IEnumerator CaptureAndUpload()
-    {
-        // 0) ARSession ×´Ì¬£¨Èç¹û»¹Ã»³õÊ¼»¯£¬Ö±½Ó·µ»Ø£©
-        if (ARSession.state <= ARSessionState.Ready)
-        {
-            if (verboseLog) Debug.LogWarning($"[ARFU] ARSession not tracking yet: {ARSession.state}");
-            yield break;
-        }
-
-        // 1) CPU Í¼Ïñ
-        if (!cameraManager.TryAcquireLatestCpuImage(out XRCpuImage image))
-        {
-            Debug.LogWarning("[ARFU] TryAcquireLatestCpuImage = false (no CPU image available)");
-            yield break;
-        }
-
-        if (verboseLog) Debug.Log($"[ARFU] Got CPU image: {image.width}x{image.height}");
-
-        var conversionParams = new XRCpuImage.ConversionParams
-        {
-            inputRect = new RectInt(0, 0, image.width, image.height),
-            outputDimensions = new Vector2Int(image.width, image.height),
-            outputFormat = TextureFormat.RGBA32,
-            //transformation = XRCpuImage.Transformation.MirrorY // ´¹Ö±·­×ª
-            transformation = XRCpuImage.Transformation.None
-        };
-
-        int size = image.GetConvertedDataSize(conversionParams);
-        var buffer = new NativeArray<byte>(size, Allocator.Temp);
-        image.Convert(conversionParams, buffer);
-        int width = image.width;
-        int height = image.height;
-        image.Dispose();
-
-        var texture = new Texture2D(width, height, TextureFormat.RGBA32, false);
-        texture.LoadRawTextureData(buffer);
-        texture.Apply();
-        buffer.Dispose();
-
-        // 2) Î»×Ë£¨camera¡úworld£©
-        var cam = cameraManager.GetComponent<Camera>().transform;
-        Quaternion qUnity = cam.rotation;
-        Vector3 tUnity = cam.position;
-
-        if (convertToOpenCVCamera)
-            qUnity = qUnity * Quaternion.Euler(0f, 180f, 0f);
-
-        float[] rot_xyzw = new float[] { qUnity.x, qUnity.y, qUnity.z, qUnity.w };
-        float[] pos_m = new float[] { tUnity.x, tUnity.y, tUnity.z };
-
-        // 3) ÄÚ²Î
-        float fx = 0, fy = 0, cx = 0, cy = 0;
-        int intrW = width, intrH = height;
-        if (cameraManager.TryGetIntrinsics(out XRCameraIntrinsics intr))
-        {
-            fx = intr.focalLength.x;
-            fy = intr.focalLength.y;
-            cx = intr.principalPoint.x;
-            cy = intr.principalPoint.y;
-            intrW = intr.resolution.x;
-            intrH = intr.resolution.y;
-        }
-
-        if (intrW != width || intrH != height)
-        {
-            float sx = (float)width / intrW;
-            float sy = (float)height / intrH;
-            fx *= sx; fy *= sy;
-            cx *= sx; cy *= sy;
-        }
-
-        float cy_flipped = (height - 1) - cy;
-
-        // 4) ×é JSON
-        long ts_ms = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        var payload = new Payload
-        {
-            timestamp_ms = ts_ms,
-            rotation_xyzw = rot_xyzw,
-            translation_m = pos_m,
-            image_size = new ImageSize { width = width, height = height },
-            intrinsics = new Intrinsics { fx = fx, fy = fy, cx = cx, cy = cy_flipped, model = "pinhole" },
-            notes = new Notes { mirrorY_applied = true, coord = convertToOpenCVCamera ? "OpenCV(+Z forward)" : "Unity(+Z forward)" }
-        };
-        string json = JsonUtility.ToJson(payload);
-
-        // 5) ÉÏ´«
-        byte[] imageBytes = texture.EncodeToPNG();
-        Destroy(texture);
-
-        var form = new WWWForm();
-        form.AddBinaryData("image", imageBytes, $"frame_{payload.timestamp_ms}.png", "image/png");
-        form.AddField("meta_json", json);
-
-        if (verboseLog) Debug.Log("[ARFU] POST " + serverUrl);
-        using (UnityWebRequest www = UnityWebRequest.Post(serverUrl, form))
-        {
-            //www.chunkedTransfer = false;  
-            www.timeout = 10;              
-            www.SetRequestHeader("Connection", "close"); 
-
-            yield return www.SendWebRequest();
-
-            if (www.result != UnityWebRequest.Result.Success)
-                Debug.LogError("[ARFU] Upload failed: " + www.error + " (code=" + www.responseCode + ")");
-            else
-                Debug.Log($"[ARFU] Uploaded #{ts_ms}, size=({width}x{height})");
-        }
-    }
-
-
-
 }

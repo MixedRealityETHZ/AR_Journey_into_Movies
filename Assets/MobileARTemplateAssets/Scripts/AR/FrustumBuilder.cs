@@ -57,11 +57,6 @@ namespace ARJourneyIntoMovies.AR
             vertices[2] = new Vector3(halfWidth, halfHeight, length);    // Top-right
             vertices[3] = new Vector3(halfWidth, -halfHeight, length);   // Bottom-right
             vertices[4] = new Vector3(-halfWidth, -halfHeight, length);  // Bottom-left
-            // Rotate 90° around X axis so that the frustum points upward (Y+)
-            for (int i = 0; i < vertices.Length; i++)
-            {
-                vertices[i] = Quaternion.Euler(90f, 0f, 0f) * vertices[i];
-            }
 
             if (wireframe)
             {

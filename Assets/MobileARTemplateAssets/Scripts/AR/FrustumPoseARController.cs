@@ -86,7 +86,7 @@ namespace ARJourneyIntoMovies.AR
                 rotation = new float[] { qUnity.w, qUnity.x, qUnity.y, qUnity.z },
                 translation = new float[] { currentTranslation.x, currentTranslation.y, currentTranslation.z },
                 fov = 60f,
-                aspect = 9f / 16f,
+                aspect = 16f / 9f,
                 movie_frame_id = "auto_mock",
                 confidence = 1.0f
             };
