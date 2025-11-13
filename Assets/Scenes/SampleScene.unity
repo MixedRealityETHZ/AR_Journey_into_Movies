@@ -7794,7 +7794,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1432666638}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5817500a6d6d947b5bcdb7b9ef332af5, type: 3}
   m_Name: 
@@ -9237,7 +9237,7 @@ MonoBehaviour:
   IPPanel: {fileID: 432319974}
   inputFieldIP: {fileID: 1132459037}
   confirmButton: {fileID: 424244177}
-  frameUploader: {fileID: 0}
+  frameUploader: {fileID: 1553500816}
   serverClient: {fileID: 1882041699}
 --- !u!1 &1849036137
 GameObject:
