@@ -33,7 +33,7 @@ public class IPPanelController : MonoBehaviour
         IPPanel.SetActive(true);
 
         // 默认显示自动 IP（可覆盖）
-        inputFieldIP.text = "http://" + autoDetectedIP + ":5000/localize";
+        inputFieldIP.text = "http://" + autoDetectedIP + ":5000";
     }
 
     private void OnConfirm()
@@ -41,10 +41,10 @@ public class IPPanelController : MonoBehaviour
         string ip = inputFieldIP.text.Trim();
 
         if (serverClient != null)
-            serverClient.serverUrl = ip;
+            serverClient.serverUrl = ip + "/localize";
 
         if (frameUploader != null)
-            frameUploader.serverUrl = ip;
+            frameUploader.serverUrl = ip + "/upload";
 
         IPPanel.SetActive(false);
     }

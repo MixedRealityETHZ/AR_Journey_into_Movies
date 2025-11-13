@@ -30,7 +30,7 @@ namespace ARJourneyIntoMovies.Server
         [SerializeField] private ARCameraManager cameraManager;
         [SerializeField] private float captureInterval = 3f;
         [SerializeField] public ServerClient serverClient; 
-        [SerializeField] private string serverUrl;
+        [SerializeField] public string serverUrl;
 
         // down stream (server / SfM��use OpenCV/+Z coordinate
         [SerializeField] private bool convertToOpenCVCamera = false;

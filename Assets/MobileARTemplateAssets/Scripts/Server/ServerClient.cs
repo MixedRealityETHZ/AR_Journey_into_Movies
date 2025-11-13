@@ -86,8 +86,8 @@ namespace ARJourneyIntoMovies.Server
 
             // Optional: export confidence/fov if needed
             pose.confidence = 1.0f;
-            pose.fov = 0;
-            pose.aspect = 0;
+            pose.fov = 60;
+            pose.aspect = 9f / 16f;
             pose.movie_frame_id = "film";
 
             Debug.Log($"[ServerClient] Final PoseData → T={pose.GetTranslation()}, R={pose.GetRotation().eulerAngles}");
