@@ -72,6 +72,7 @@
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/GuidanceController.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/TargetFrustumVisualizer.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/Server/IPPanelController.cs" />
+    <Compile Include="Assets/MobileARTemplateAssets/Scripts/UI/LocalizationProgressUI.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/UI/Scripts/CutoutMaskUI.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/ARTemplateMenuManager.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/ARFeatheredPlaneMeshVisualizerCompanion.cs" />

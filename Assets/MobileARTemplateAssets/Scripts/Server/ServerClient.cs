@@ -20,6 +20,7 @@ namespace ARJourneyIntoMovies.Server
     {
         public bool success;
         public SessionPose session_pose;
+        public string reason;
     }
     /// <summary>
     /// Client for communicating with HLoc server (localization service)
@@ -68,7 +69,13 @@ namespace ARJourneyIntoMovies.Server
 
             if (!raw.success)
             {
-                OnError?.Invoke("Server returned success=false");
+                string reason = string.IsNullOrEmpty(raw.reason)
+                    ? "Localization not ready. Please continue capturing."
+                    : raw.reason;
+
+                Debug.LogWarning("[ServerClient] Server returned success=false: " + reason);
+
+                OnError?.Invoke(reason);
                 return;
             }
 

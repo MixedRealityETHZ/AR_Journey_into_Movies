@@ -34,6 +34,11 @@ namespace ARJourneyIntoMovies.Server
 
         // down stream (server / SfM��use OpenCV/+Z coordinate
         [SerializeField] private bool convertToOpenCVCamera = false;
+        [SerializeField] private bool verboseLog = true; // ������־����
+        [Header("Manual Capture Mode")]
+        public bool enableManualCapture = true;   // ⬅ 启用手动拍照模式
+        public int requiredFrames = 4;            // ⬅ 需要累积的照片数量
+        private int capturedCount = 0;            // ⬅ 已经拍了几张
 
         private float timer = 0f;
 
@@ -45,16 +50,15 @@ namespace ARJourneyIntoMovies.Server
 
         void Update()
         {
-            timer += Time.deltaTime;
-            if (timer >= captureInterval)
-            {
-                timer = 0f;
-                if (verboseLog) Debug.Log($"[ARFU] tick �� try capture (interval={captureInterval}s)");
-                StartCoroutine(CaptureAndUpload());
-            }
+            // timer += Time.deltaTime;
+            // if (timer >= captureInterval)
+            // {
+            //     timer = 0f;
+            //     if (verboseLog) Debug.Log($"[ARFU] tick �� try capture (interval={captureInterval}s)");
+            //     StartCoroutine(CaptureAndUpload());
+            // }
         }
-
-        [SerializeField] private bool verboseLog = true; // ������־����
+        
         void OnEnable()
         {
             // ���Ĳ��� frameReceived Ҳû��ϵ���㵱ǰ���� Update ��ʱ����������ֻ��������ͨ�Լ�
@@ -84,6 +88,14 @@ namespace ARJourneyIntoMovies.Server
             }
         }
 
+        // 📸 公开给 UI 按钮的函数
+        public void CaptureOneFrame()
+        {
+            if (verboseLog) Debug.Log("[ManualCapture] User requested capture.");
+
+            StartCoroutine(CaptureAndUpload());
+        }
+
         private IEnumerator CaptureAndUpload()
         {
             // 0) ARSession ״̬�������û��ʼ����ֱ�ӷ��أ�
@@ -107,8 +119,8 @@ namespace ARJourneyIntoMovies.Server
                 inputRect = new RectInt(0, 0, image.width, image.height),
                 outputDimensions = new Vector2Int(image.width, image.height),
                 outputFormat = TextureFormat.RGBA32,
-                //transformation = XRCpuImage.Transformation.MirrorY // ��ֱ��ת
-                transformation = XRCpuImage.Transformation.None
+                transformation = XRCpuImage.Transformation.MirrorY // ��ֱ��ת
+                // transformation = XRCpuImage.Transformation.None
             };
 
             int size = image.GetConvertedDataSize(conversionParams);
@@ -182,7 +194,7 @@ namespace ARJourneyIntoMovies.Server
             using (UnityWebRequest www = UnityWebRequest.Post(serverUrl, form))
             {
                 //www.chunkedTransfer = false;  
-                www.timeout = 10;              
+                // www.timeout = 10;              
                 www.SetRequestHeader("Connection", "close"); 
 
                 yield return www.SendWebRequest();
@@ -190,8 +202,9 @@ namespace ARJourneyIntoMovies.Server
                 if (www.result != UnityWebRequest.Result.Success)
                     Debug.LogError("[ARFU] Upload failed: " + www.error + " (code=" + www.responseCode + ")");
                 else
-                    Debug.Log($"[ARFU] Uploaded #{ts_ms}, size=({width}x{height})");
+                {
                     serverClient.ProcessServerResponse(www.downloadHandler.text);
+                }
             }
         }
     }
