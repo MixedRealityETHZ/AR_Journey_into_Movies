@@ -107,14 +107,5 @@ namespace ARJourneyIntoMovies.UI
         /// <summary>
         /// Test button - trigger mock server response
         /// </summary>
-        public void OnClickTestMockResponse()
-        {
-            Debug.Log("[ButtonEvents] OnClickTestMockResponse called");
-
-            if (serverClient != null)
-            {
-                serverClient.TriggerMockResponse();
-            }
-        }
     }
 }

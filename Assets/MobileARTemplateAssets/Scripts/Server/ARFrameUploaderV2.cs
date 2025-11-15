@@ -28,19 +28,12 @@ namespace ARJourneyIntoMovies.Server
     public class ARFrameUploaderV2 : MonoBehaviour
     {
         [SerializeField] private ARCameraManager cameraManager;
-        [SerializeField] private float captureInterval = 3f;
         [SerializeField] public ServerClient serverClient; 
-        [SerializeField] public string serverUrl;
+        public string serverUrl;
 
         // down stream (server / SfM��use OpenCV/+Z coordinate
         [SerializeField] private bool convertToOpenCVCamera = false;
-        [SerializeField] private bool verboseLog = true; // ������־����
-        [Header("Manual Capture Mode")]
-        public bool enableManualCapture = true;   // ⬅ 启用手动拍照模式
-        public int requiredFrames = 4;            // ⬅ 需要累积的照片数量
-        private int capturedCount = 0;            // ⬅ 已经拍了几张
-
-        private float timer = 0f;
+        [SerializeField] private bool verboseLog = true; 
 
         void Awake()
         {
@@ -50,18 +43,11 @@ namespace ARJourneyIntoMovies.Server
 
         void Update()
         {
-            // timer += Time.deltaTime;
-            // if (timer >= captureInterval)
-            // {
-            //     timer = 0f;
-            //     if (verboseLog) Debug.Log($"[ARFU] tick �� try capture (interval={captureInterval}s)");
-            //     StartCoroutine(CaptureAndUpload());
-            // }
+ 
         }
         
         void OnEnable()
         {
-            // ���Ĳ��� frameReceived Ҳû��ϵ���㵱ǰ���� Update ��ʱ����������ֻ��������ͨ�Լ�
             try
             {
                 var baseUrl = serverUrl;
@@ -98,14 +84,12 @@ namespace ARJourneyIntoMovies.Server
 
         private IEnumerator CaptureAndUpload()
         {
-            // 0) ARSession ״̬�������û��ʼ����ֱ�ӷ��أ�
             if (ARSession.state <= ARSessionState.Ready)
             {
                 if (verboseLog) Debug.LogWarning($"[ARFU] ARSession not tracking yet: {ARSession.state}");
                 yield break;
             }
 
-            // 1) CPU ͼ��
             if (!cameraManager.TryAcquireLatestCpuImage(out XRCpuImage image))
             {
                 Debug.LogWarning("[ARFU] TryAcquireLatestCpuImage = false (no CPU image available)");
@@ -135,7 +119,6 @@ namespace ARJourneyIntoMovies.Server
             texture.Apply();
             buffer.Dispose();
 
-            // 2) λ�ˣ�camera��world��
             var cam = cameraManager.GetComponent<Camera>().transform;
             Quaternion qUnity = cam.rotation;
             Vector3 tUnity = cam.position;
@@ -146,7 +129,6 @@ namespace ARJourneyIntoMovies.Server
             float[] rot_xyzw = new float[] { qUnity.x, qUnity.y, qUnity.z, qUnity.w };
             float[] pos_m = new float[] { tUnity.x, tUnity.y, tUnity.z };
 
-            // 3) �ڲ�
             float fx = 0, fy = 0, cx = 0, cy = 0;
             int intrW = width, intrH = height;
             if (cameraManager.TryGetIntrinsics(out XRCameraIntrinsics intr))
@@ -182,7 +164,6 @@ namespace ARJourneyIntoMovies.Server
             };
             string json = JsonUtility.ToJson(payload);
 
-            // 5) �ϴ�
             byte[] imageBytes = texture.EncodeToPNG();
             Destroy(texture);
 
@@ -192,9 +173,7 @@ namespace ARJourneyIntoMovies.Server
 
             if (verboseLog) Debug.Log("[ARFU] POST " + serverUrl);
             using (UnityWebRequest www = UnityWebRequest.Post(serverUrl, form))
-            {
-                //www.chunkedTransfer = false;  
-                // www.timeout = 10;              
+            {         
                 www.SetRequestHeader("Connection", "close"); 
 
                 yield return www.SendWebRequest();

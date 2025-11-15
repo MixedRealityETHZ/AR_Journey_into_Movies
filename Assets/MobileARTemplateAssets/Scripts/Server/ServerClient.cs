@@ -30,17 +30,6 @@ namespace ARJourneyIntoMovies.Server
     {
         [Header("UI References")]
         public GameObject hudPanel;
-        [Header("Server Configuration")]
-        [Tooltip("URL of the localization server")]
-        public string serverUrl;
-
-        [Header("Request Settings")]
-        [Tooltip("JPEG quality for image compression (0-100)")]
-        [Range(0, 100)]
-        public int jpegQuality = 75;
-
-        [Tooltip("Request timeout in seconds")]
-        public float timeoutSeconds = 30f;
 
         // Events (cannot use [Header] attribute on events)
         public event Action<PoseData> OnPoseReceived;
@@ -48,7 +37,6 @@ namespace ARJourneyIntoMovies.Server
 
         private void Awake()
         {
-            Debug.Log($"[ServerClient] Initialized with server URL: {serverUrl}");
         }
 
         public void ProcessServerResponse(string json)

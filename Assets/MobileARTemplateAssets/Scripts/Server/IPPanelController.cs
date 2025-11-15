@@ -40,8 +40,8 @@ public class IPPanelController : MonoBehaviour
         string ip = inputFieldIP.text.Trim();
         remembered_ip = ip;
 
-        if (serverClient != null)
-            serverClient.serverUrl = ip + "/localize";
+        // if (serverClient != null)
+        //     serverClient.serverUrl = ip + "/localize";
 
         if (frameUploader != null)
             frameUploader.serverUrl = ip + "/upload";
