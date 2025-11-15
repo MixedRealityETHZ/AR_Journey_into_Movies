@@ -14,17 +14,16 @@ public class IPPanelController : MonoBehaviour
     public ARFrameUploaderV2 frameUploader;
     public ServerClient serverClient;
 
-    private string autoDetectedIP;
+    private string remembered_ip;
 
     private void Start()
     {
+        remembered_ip = "http://";
         IPPanel.SetActive(false);
 
         if (confirmButton != null)
             confirmButton.onClick.AddListener(OnConfirm);
 
-        // 自动检测本机 IP
-        autoDetectedIP = NetworkUtils.GetLocalIPv4();
         Debug.Log("[IPPanel] Auto ip = " + autoDetectedIP);
     }
     
@@ -33,12 +32,13 @@ public class IPPanelController : MonoBehaviour
         IPPanel.SetActive(true);
 
         // 默认显示自动 IP（可覆盖）
-        inputFieldIP.text = "http://" + autoDetectedIP + ":5000";
+        inputFieldIP.text = remembered_ip;
     }
 
     private void OnConfirm()
     {
         string ip = inputFieldIP.text.Trim();
+        remembered_ip = ip;
 
         if (serverClient != null)
             serverClient.serverUrl = ip + "/localize";
