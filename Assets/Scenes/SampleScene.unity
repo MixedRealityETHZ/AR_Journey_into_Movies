@@ -1551,7 +1551,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &469460194
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3201,6 +3201,9 @@ MonoBehaviour:
   overlayManager: {fileID: 1849036139}
   canvasHUD: {fileID: 469460195}
   arCameraManager: {fileID: 1553500804}
+  photoButton: {fileID: 1952740681}
+  localizeInfoPanel: {fileID: 1676342204}
+  localizeInfoText: {fileID: 1882272701}
 --- !u!1 &1483534367
 GameObject:
   m_ObjectHideFlags: 0
@@ -3491,12 +3494,12 @@ GameObject:
   - component: {fileID: 1676342207}
   - component: {fileID: 1676342206}
   m_Layer: 5
-  m_Name: ProgressPanel
+  m_Name: LocalizeInfoPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1676342205
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4482,7 +4485,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1952740682
 RectTransform:
   m_ObjectHideFlags: 0

@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using ARJourneyIntoMovies.AR;
 using ARJourneyIntoMovies.Server;
+using TMPro;
 
 namespace ARJourneyIntoMovies.UI
 {
@@ -21,6 +22,11 @@ namespace ARJourneyIntoMovies.UI
 
         [Header("AR Components")]
         public ARCameraManager arCameraManager;
+        [Header("UI Buttons")]
+        public GameObject photoButton;
+        [Header("UI Panels")]
+        public GameObject localizeInfoPanel;    
+        public TMP_Text localizeInfoText;
 
         private void Awake()
         {
@@ -52,6 +58,17 @@ namespace ARJourneyIntoMovies.UI
 
             // ⭐⭐⭐ 启动 ARFrameUploader 自动上传
             uploader.enabled = true;
+            // ⭐ 显示拍照按钮
+            if (photoButton != null)
+                photoButton.SetActive(true);
+            // ⭐ 显示提示用户开始拍照的面板
+            if (localizeInfoPanel != null)
+            {
+                localizeInfoPanel.SetActive(true);
+
+                if (localizeInfoText != null)
+                    localizeInfoText.text = "Connecting to server..."; // 👈 你需要的文本
+            }
 
             Debug.Log("[ButtonEvents] Localization started — ARFrameUploaderV2 enabled.");
         }
