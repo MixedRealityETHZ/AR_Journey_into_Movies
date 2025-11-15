@@ -80,14 +80,12 @@
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/GuidanceTest.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/GoalManager.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/UI/CanvasHUD.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/FrustumDebugPanel.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/UI/OverlayUI.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/Server/ServerClient.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/OverlayManager.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/MatrixHelper.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/ARPlaneMeshVisualizerFader.cs" />
     <Compile Include="Assets/Settings/Project Configuration/SceneTemplate_RotateCube.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/FrustumPoseARController.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/PoseFusionTest.cs" />
   </ItemGroup>
   <ItemGroup>

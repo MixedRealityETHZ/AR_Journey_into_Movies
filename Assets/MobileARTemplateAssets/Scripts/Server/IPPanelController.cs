@@ -24,7 +24,7 @@ public class IPPanelController : MonoBehaviour
         if (confirmButton != null)
             confirmButton.onClick.AddListener(OnConfirm);
 
-        Debug.Log("[IPPanel] Auto ip = " + autoDetectedIP);
+        Debug.Log("[IPPanel] Auto ip = " + remembered_ip);
     }
     
     public void OpenIPPanel()
