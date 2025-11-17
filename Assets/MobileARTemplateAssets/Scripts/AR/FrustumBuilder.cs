@@ -141,7 +141,7 @@ namespace ARJourneyIntoMovies.AR
         private void BuildSolidMesh(Mesh mesh, Vector3[] frustumVertices)
         {
             // 5 faces: 4 triangle sides + 1 quad far plane
-            Vector3[] vertices = new Vector3[16]; // Duplicate vertices for proper normals
+            Vector3[] vertices = new Vector3[5]; // Duplicate vertices for proper normals
             int[] triangles = new int[18]; // 4 triangles (sides) + 2 triangles (far plane)
 
             // Copy vertices (duplicated for each face to have correct normals)
@@ -152,19 +152,12 @@ namespace ARJourneyIntoMovies.AR
 
             // Triangle indices for 4 side faces
             // Face 1: Apex - Top-left - Top-right
-            triangles[0] = 0; triangles[1] = 1; triangles[2] = 2;
-            // Face 2: Apex - Top-right - Bottom-right
-            triangles[3] = 0; triangles[4] = 2; triangles[5] = 3;
-            // Face 3: Apex - Bottom-right - Bottom-left
-            triangles[6] = 0; triangles[7] = 3; triangles[8] = 4;
-            // Face 4: Apex - Bottom-left - Top-left
-            triangles[9] = 0; triangles[10] = 4; triangles[11] = 1;
-
-            // Far plane (quad = 2 triangles)
-            // Triangle 1: Top-left - Top-right - Bottom-right
-            triangles[12] = 1; triangles[13] = 2; triangles[14] = 3;
-            // Triangle 2: Top-left - Bottom-right - Bottom-left
-            triangles[15] = 1; triangles[16] = 3; triangles[17] = 4;
+            triangles[0] = 0; triangles[1] = 2; triangles[2] = 1;
+            triangles[3] = 0; triangles[4] = 3; triangles[5] = 2;
+            triangles[6] = 0; triangles[7] = 4; triangles[8] = 3;
+            triangles[9] = 0; triangles[10] = 1; triangles[11] = 4;
+            triangles[12] = 1; triangles[13] = 3; triangles[14] = 2;
+            triangles[15] = 1; triangles[16] = 4; triangles[17] = 3;
 
             mesh.vertices = vertices;
             mesh.triangles = triangles;

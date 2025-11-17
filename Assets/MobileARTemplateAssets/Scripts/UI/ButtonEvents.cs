@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
-using ARJourneyIntoMovies.Server;
 using ARJourneyIntoMovies.AR;
+using ARJourneyIntoMovies.Server;
+using TMPro;
 
 namespace ARJourneyIntoMovies.UI
 {
@@ -12,6 +13,7 @@ namespace ARJourneyIntoMovies.UI
     public class ButtonEvents : MonoBehaviour
     {
         [Header("Manager References")]
+        public ARFrameUploaderV2 uploader;
         public ServerClient serverClient;
         public PoseFusion poseFusion;
         public GuidanceController guidanceController;
@@ -20,6 +22,11 @@ namespace ARJourneyIntoMovies.UI
 
         [Header("AR Components")]
         public ARCameraManager arCameraManager;
+        [Header("UI Buttons")]
+        public GameObject photoButton;
+        [Header("UI Panels")]
+        public GameObject localizeInfoPanel;    
+        public TMP_Text localizeInfoText;
 
         private void Awake()
         {
@@ -35,9 +42,7 @@ namespace ARJourneyIntoMovies.UI
             Debug.Log("[ButtonEvents] OnClickLocalize called");
 
             if (canvasHUD != null)
-            {
                 canvasHUD.SetStatus("Localizing...");
-            }
 
             if (serverClient == null)
             {
@@ -45,38 +50,27 @@ namespace ARJourneyIntoMovies.UI
                 return;
             }
 
-            // Use dummy texture for testing (both Editor and Device)
-            // TODO: Later replace with actual ARCameraManager.TryAcquireLatestCpuImage() or image picker
-            Debug.Log("[ButtonEvents] Using dummy image for testing");
-            Texture2D dummyTexture = CreateDummyTexture(1920, 1080);
-            Vector4 dummyIntrinsics = new Vector4(1000f, 1000f, 960f, 540f); // fx, fy, cx, cy
-            StartCoroutine(serverClient.SendQueryImage(dummyTexture, dummyIntrinsics));
-        }
-
-        /// <summary>
-        /// Create dummy texture for Editor testing
-        /// </summary>
-        private Texture2D CreateDummyTexture(int width, int height)
-        {
-            Texture2D texture = new Texture2D(width, height, TextureFormat.RGB24, false);
-
-            // Fill with gradient pattern
-            Color[] pixels = new Color[width * height];
-            for (int y = 0; y < height; y++)
+            if (uploader == null)
             {
-                for (int x = 0; x < width; x++)
-                {
-                    float r = (float)x / width;
-                    float g = (float)y / height;
-                    float b = 0.5f;
-                    pixels[y * width + x] = new Color(r, g, b);
-                }
+                Debug.LogError("[ButtonEvents] ARFrameUploaderV2 reference is null!");
+                return;
             }
 
-            texture.SetPixels(pixels);
-            texture.Apply();
+            // ⭐⭐⭐ 启动 ARFrameUploader 自动上传
+            uploader.enabled = true;
+            // ⭐ 显示拍照按钮
+            if (photoButton != null)
+                photoButton.SetActive(true);
+            // ⭐ 显示提示用户开始拍照的面板
+            if (localizeInfoPanel != null)
+            {
+                localizeInfoPanel.SetActive(true);
 
-            return texture;
+                if (localizeInfoText != null)
+                    localizeInfoText.text = "Connecting to server..."; // 👈 你需要的文本
+            }
+
+            Debug.Log("[ButtonEvents] Localization started — ARFrameUploaderV2 enabled.");
         }
 
         /// <summary>
@@ -130,14 +124,5 @@ namespace ARJourneyIntoMovies.UI
         /// <summary>
         /// Test button - trigger mock server response
         /// </summary>
-        public void OnClickTestMockResponse()
-        {
-            Debug.Log("[ButtonEvents] OnClickTestMockResponse called");
-
-            if (serverClient != null)
-            {
-                serverClient.TriggerMockResponse();
-            }
-        }
     }
 }

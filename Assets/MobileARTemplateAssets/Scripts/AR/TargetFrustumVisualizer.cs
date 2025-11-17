@@ -178,5 +178,13 @@ namespace ARJourneyIntoMovies.AR
         {
             return frustumInstance;
         }
+
+        public void UpdateFrustumPose(Matrix4x4 pose)
+        {
+            transform.SetPositionAndRotation(
+                MatrixHelper.GetPosition(pose),
+                MatrixHelper.GetRotation(pose)
+            );
+        }
     }
 }
