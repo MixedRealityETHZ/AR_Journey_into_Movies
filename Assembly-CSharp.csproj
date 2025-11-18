@@ -86,6 +86,7 @@
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/MatrixHelper.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/ARPlaneMeshVisualizerFader.cs" />
     <Compile Include="Assets/Settings/Project Configuration/SceneTemplate_RotateCube.cs" />
+    <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/FrustumPoseARController.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/PoseFusionTest.cs" />
   </ItemGroup>
   <ItemGroup>
