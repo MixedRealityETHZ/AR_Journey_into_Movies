@@ -25,6 +25,7 @@ namespace ARJourneyIntoMovies.UI
         [Header("UI Buttons")]
         public GameObject photoButton;
         [Header("UI Panels")]
+        public MapViewController mapView;
         public GameObject localizeInfoPanel;    
         public TMP_Text localizeInfoText;
 
@@ -39,6 +40,13 @@ namespace ARJourneyIntoMovies.UI
         /// </summary>
         public void OnClickLocalize()
         {
+            // 打开地图 Panel
+            if (mapView != null)
+            {
+                mapView.gameObject.SetActive(true);
+                mapView.ShowMap();
+            }
+            
             Debug.Log("[ButtonEvents] OnClickLocalize called");
 
             if (canvasHUD != null)
@@ -56,19 +64,19 @@ namespace ARJourneyIntoMovies.UI
                 return;
             }
 
-            // ⭐⭐⭐ 启动 ARFrameUploader 自动上传
-            uploader.enabled = true;
+            // // ⭐⭐⭐ 启动 ARFrameUploader 自动上传
+            // uploader.enabled = true;
             // ⭐ 显示拍照按钮
-            if (photoButton != null)
-                photoButton.SetActive(true);
-            // ⭐ 显示提示用户开始拍照的面板
-            if (localizeInfoPanel != null)
-            {
-                localizeInfoPanel.SetActive(true);
+            // if (photoButton != null)
+            //     photoButton.SetActive(true);
+            // // ⭐ 显示提示用户开始拍照的面板
+            // if (localizeInfoPanel != null)
+            // {
+            //     localizeInfoPanel.SetActive(true);
 
-                if (localizeInfoText != null)
-                    localizeInfoText.text = "Connecting to server..."; // 👈 你需要的文本
-            }
+            //     if (localizeInfoText != null)
+            //         localizeInfoText.text = "Connecting to server..."; // 👈 你需要的文本
+            // }
 
             Debug.Log("[ButtonEvents] Localization started — ARFrameUploaderV2 enabled.");
         }

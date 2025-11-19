@@ -19,7 +19,7 @@
     <RootNamespace></RootNamespace>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>Assembly-CSharp</AssemblyName>
+    <AssemblyName>Assembly-CSharp-firstpass</AssemblyName>
     <TargetFramework>netstandard2.1</TargetFramework>
     <BaseDirectory>.</BaseDirectory>
   </PropertyGroup>
@@ -54,7 +54,7 @@
     <UnityProjectGenerator>Package</UnityProjectGenerator>
     <UnityProjectGeneratorVersion>2.0.22</UnityProjectGeneratorVersion>
     <UnityProjectGeneratorStyle>SDK</UnityProjectGeneratorStyle>
-    <UnityProjectType>Game:1</UnityProjectType>
+    <UnityProjectType>GamePlugins:3</UnityProjectType>
     <UnityBuildTarget>iOS:9</UnityBuildTarget>
     <UnityVersion>2022.3.62f2</UnityVersion>
   </PropertyGroup>
@@ -64,61 +64,7 @@
     <Analyzer Include="/Applications/Unity/Hub/Editor/2022.3.62f2/Unity.app/Contents/Tools/Unity.SourceGenerators/Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/PoseFusion.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/FrustumBuilder.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/UI/ButtonEvents.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/Server/PoseData.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/TriangleMeshGenerator.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/GuidanceController.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/TargetFrustumVisualizer.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/Server/IPPanelController.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/UI/LocalizationProgressUI.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/UI/Scripts/CutoutMaskUI.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/ARTemplateMenuManager.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/ARFeatheredPlaneMeshVisualizerCompanion.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/Server/ARFrameUploaderV2.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/GuidanceTest.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/MapViewController.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/UI/RotateIcon.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/GoalManager.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/UI/CanvasHUD.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/UI/OverlayUI.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/Server/ServerClient.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/OverlayManager.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/MatrixHelper.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/ARPlaneMeshVisualizerFader.cs" />
-    <Compile Include="Assets/Settings/Project Configuration/SceneTemplate_RotateCube.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/FrustumPoseARController.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/PoseFusionTest.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Assets/TextMesh Pro/Shaders/TMPro.cginc" />
-    <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile Overlay.shader" />
-    <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile-2-Pass.shader" />
-    <None Include="Assets/TextMesh Pro/Shaders/TMP_Bitmap.shader" />
-    <None Include="Assets/TextMesh Pro/Shaders/TMPro_Mobile.cginc" />
-    <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF SSD.shader" />
-    <None Include="Assets/MobileARTemplateAssets/Shaders/ShadowReceiver/ShadowReceiverShaderFunctions.hlsl" />
-    <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Surface-Mobile.shader" />
-    <None Include="Assets/TextMesh Pro/Shaders/SDFFunctions.hlsl" />
-    <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Surface.shader" />
-    <None Include="Assets/TextMesh Pro/Sprites/EmojiOne Attribution.txt" />
-    <None Include="Assets/TextMesh Pro/Shaders/TMP_Bitmap-Custom-Atlas.shader" />
-    <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF.shader" />
-    <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile SSD.shader" />
-    <None Include="Assets/TextMesh Pro/Resources/LineBreaking Leading Characters.txt" />
-    <None Include="Assets/TextMesh Pro/Shaders/TMPro_Properties.cginc" />
-    <None Include="Assets/MobileARTemplateAssets/UI/Fonts/OFL.txt" />
-    <None Include="Assets/TextMesh Pro/Shaders/TMPro_Surface.cginc" />
-    <None Include="Assets/TextMesh Pro/Resources/LineBreaking Following Characters.txt" />
-    <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile Masking.shader" />
-    <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF Overlay.shader" />
-    <None Include="Assets/TextMesh Pro/Shaders/TMP_Bitmap-Mobile.shader" />
-    <None Include="Assets/TextMesh Pro/Fonts/LiberationSans - OFL.txt" />
-    <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile.shader" />
-    <None Include="Assets/MobileARTemplateAssets/Shaders/URPShadowReceiver.shader" />
-    <None Include="Assets/TextMesh Pro/Shaders/TMP_Sprite.shader" />
-    <None Include="Assets/MobileARTemplateAssets/Shaders/PlaneOcclusionShader.shader" />
+    <Compile Include="Assets/Plugins/WebViewObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -1231,7 +1177,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Assembly-CSharp-firstpass.csproj" />
     <ProjectReference Include="Unity.XR.Interaction.Toolkit.Samples.ARStarterAssets.csproj" />
     <ProjectReference Include="Unity.XR.Interaction.Toolkit.Samples.StarterAssets.Editor.csproj" />
     <ProjectReference Include="Unity.XR.Interaction.Toolkit.Samples.StarterAssets.csproj" />
