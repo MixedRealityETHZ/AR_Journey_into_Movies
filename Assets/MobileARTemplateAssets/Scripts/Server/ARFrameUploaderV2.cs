@@ -6,7 +6,6 @@ using UnityEngine.Networking;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using Unity.Collections;
-using ARJourneyIntoMovies.Server;
 
 namespace ARJourneyIntoMovies.Server
 {
@@ -48,31 +47,41 @@ namespace ARJourneyIntoMovies.Server
         
         void OnEnable()
         {
-            try
-            {
-                var baseUrl = serverUrl;
-                var i = baseUrl.LastIndexOf("/upload");
-                if (i > 0) baseUrl = baseUrl.Substring(0, i);
-                StartCoroutine(PingServer(baseUrl + "/ping"));
-            }
-            catch (System.Exception e)
-            {
-                if (verboseLog) Debug.LogWarning("[ARFU] Build ping URL failed: " + e.Message);
-            }
+            // try
+            // {
+            //     var baseUrl = serverUrl;
+            //     var i = baseUrl.LastIndexOf("/upload");
+            //     if (i > 0) baseUrl = baseUrl.Substring(0, i);
+            //     StartCoroutine(PingServer(baseUrl + "/ping"));
+            // }
+            // catch (System.Exception e)
+            // {
+            //     if (verboseLog) Debug.LogWarning("[ARFU] Build ping URL failed: " + e.Message);
+            // }
         }
+        // public void TestConnection()
+        // {
+        //     string baseUrl = serverUrl;
+        //     int i = baseUrl.LastIndexOf("/upload");
+        //     if (i > 0) baseUrl = baseUrl.Substring(0, i);
 
-        private IEnumerator PingServer(string url)
-        {
-            if (verboseLog) Debug.Log("[ARFU] Pinging " + url);
-            using (UnityWebRequest www = UnityWebRequest.Get(url))
-            {
-                yield return www.SendWebRequest();
-                if (www.result != UnityWebRequest.Result.Success)
-                    Debug.LogError("[ARFU] Ping failed: " + www.error);
-                else if (verboseLog)
-                    Debug.Log("[ARFU] Ping ok: " + www.downloadHandler.text);
-            }
-        }
+        //     StartCoroutine(PingServer(baseUrl + "/ping"));
+        // }
+
+        // private IEnumerator PingServer(string url)
+        // {
+        //     if (verboseLog) Debug.Log("[ARFU] Pinging " + url);
+        //     using (UnityWebRequest www = UnityWebRequest.Get(url))
+        //     {
+        //         www.timeout = 5;  // 最多等 5 秒
+
+        //         yield return www.SendWebRequest();
+        //         if (www.result != UnityWebRequest.Result.Success)
+        //             Debug.LogError("[ARFU] Ping failed: " + www.error);
+        //         else if (verboseLog)
+        //             Debug.Log("[ARFU] Ping ok: " + www.downloadHandler.text);
+        //     }
+        // }
 
         // 📸 公开给 UI 按钮的函数
         public void CaptureOneFrame()

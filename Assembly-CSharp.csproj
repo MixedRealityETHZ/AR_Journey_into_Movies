@@ -78,6 +78,7 @@
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/ARFeatheredPlaneMeshVisualizerCompanion.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/Server/ARFrameUploaderV2.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/GuidanceTest.cs" />
+    <Compile Include="Assets/MobileARTemplateAssets/Scripts/UI/RotateIcon.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/GoalManager.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/UI/CanvasHUD.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/UI/OverlayUI.cs" />

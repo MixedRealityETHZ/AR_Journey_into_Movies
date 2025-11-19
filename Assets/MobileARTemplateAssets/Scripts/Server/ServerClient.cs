@@ -1,11 +1,5 @@
 using System;
-using System.Collections;
-using System.Text;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.Networking;
-using UnityEngine.UI;
-using ARJourneyIntoMovies.AR;
 
 namespace ARJourneyIntoMovies.Server
 {
