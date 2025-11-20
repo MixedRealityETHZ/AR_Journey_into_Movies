@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.XR.Interaction.Toolki
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.XR.Interaction.Toolkit.Samples.ARStarterAssets", "Unity.XR.Interaction.Toolkit.Samples.ARStarterAssets.csproj", "{C06E91DF-100E-F775-D103-5F558273E914}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NativeGallery.Editor", "NativeGallery.Editor.csproj", "{56C11F6A-A662-F55E-50D0-1A46FD4C0599}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NativeGallery.Runtime", "NativeGallery.Runtime.csproj", "{0631CA23-C3FD-8918-4524-881EFE1F2AC1}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.XR.Interaction.Toolkit.Samples.ARStarterAssets.Editor", "Unity.XR.Interaction.Toolkit.Samples.ARStarterAssets.Editor.csproj", "{C7A8DE3A-4A41-BA7C-9841-3BA64F7818BB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor-firstpass", "Assembly-CSharp-Editor-firstpass.csproj", "{AE00E0D4-E0CC-8614-93B1-A778D5CEA81C}"
@@ -33,6 +37,14 @@ Global
 		{C06E91DF-100E-F775-D103-5F558273E914}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C06E91DF-100E-F775-D103-5F558273E914}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C06E91DF-100E-F775-D103-5F558273E914}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56C11F6A-A662-F55E-50D0-1A46FD4C0599}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56C11F6A-A662-F55E-50D0-1A46FD4C0599}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56C11F6A-A662-F55E-50D0-1A46FD4C0599}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56C11F6A-A662-F55E-50D0-1A46FD4C0599}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0631CA23-C3FD-8918-4524-881EFE1F2AC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0631CA23-C3FD-8918-4524-881EFE1F2AC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0631CA23-C3FD-8918-4524-881EFE1F2AC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0631CA23-C3FD-8918-4524-881EFE1F2AC1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C7A8DE3A-4A41-BA7C-9841-3BA64F7818BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C7A8DE3A-4A41-BA7C-9841-3BA64F7818BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7A8DE3A-4A41-BA7C-9841-3BA64F7818BB}.Release|Any CPU.ActiveCfg = Release|Any CPU

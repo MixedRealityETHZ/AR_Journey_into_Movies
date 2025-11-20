@@ -47,7 +47,7 @@ namespace ARJourneyIntoMovies.UI
 
             if (distanceText != null)
             {
-                distanceText.text = $"Distance: {distanceStr}";
+                distanceText.text = $"{distanceStr}";
             }
         }
 

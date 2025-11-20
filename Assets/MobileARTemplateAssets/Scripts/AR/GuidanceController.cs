@@ -1,5 +1,6 @@
 using UnityEngine;
 using ARJourneyIntoMovies.UI;
+using UnityEngine.UI;
 
 namespace ARJourneyIntoMovies.AR
 {
@@ -26,6 +27,13 @@ namespace ARJourneyIntoMovies.AR
         public OverlayManager overlayManager;
 
         [Header("Arrow Settings")]
+        public Sprite LeftArrow;             
+        public Sprite SlightlyLeftArrow;     
+        public Sprite RightArrow;
+        public Sprite SlightlyRightArrow;
+        public Sprite StraightArrow;     
+        public Image ArrowIcon;
+
         [Tooltip("Distance in front of camera to place arrow (meters)")]
         public float arrowDistanceFromCamera = 1.5f;
 
@@ -42,7 +50,7 @@ namespace ARJourneyIntoMovies.AR
 
         [Header("Thresholds")]
         [Tooltip("Distance threshold to switch to overlay mode (meters)")]
-        public float overlayDistanceThreshold = 0.6f;
+        public float overlayDistanceThreshold = 0.5f;
 
         [Tooltip("Angle threshold (yaw) to switch to overlay mode (degrees)")]
         public float overlayAngleThreshold = 6f;
@@ -267,6 +275,7 @@ namespace ARJourneyIntoMovies.AR
             // Check alignment
             if (Mathf.Abs(yaw) < alignedAngleThreshold)
             {
+                ArrowIcon.sprite = StraightArrow;
                 if (distance < overlayDistanceThreshold * 1.5f)
                 {
                     return "Almost there!";
@@ -277,18 +286,22 @@ namespace ARJourneyIntoMovies.AR
             // Directional hints
             if (yaw > 45f)
             {
+                ArrowIcon.sprite = RightArrow;
                 return "Turn right";
             }
             else if (yaw > 15f)
             {
+                ArrowIcon.sprite = SlightlyRightArrow;
                 return "Turn slightly right";
             }
             else if (yaw < -45f)
             {
+                ArrowIcon.sprite = LeftArrow;
                 return "Turn left";
             }
             else if (yaw < -15f)
             {
+                ArrowIcon.sprite = SlightlyLeftArrow;
                 return "Turn slightly left";
             }
 

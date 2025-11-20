@@ -83,5 +83,28 @@ namespace ARJourneyIntoMovies.Server
 
             OnPoseReceived?.Invoke(pose);
         }
+
+        /// <summary>
+        /// Mock response for testing (triggers event without network call)
+        /// </summary>
+        public void TriggerMockResponse()
+        {
+            Debug.Log("[ServerClient] Triggering mock response");
+
+            PoseData mockData = new PoseData
+            {
+                success = true,
+                rotation = new float[] { 1f, 0f, 0f, 0f }, // w, x, y, z (identity rotation)
+                translation = new float[] { 0f, 0f, 2f },   // x, y, z (2m forward)
+                fov = 60f,
+                aspect = 9f / 16f,
+                movie_frame_id = "mock_frame_001",
+                confidence = 0.95f
+            };
+
+            OnPoseReceived?.Invoke(mockData);
+        }
+
+        
     }
 }

@@ -24,10 +24,6 @@ namespace ARJourneyIntoMovies.UI
         public ARCameraManager arCameraManager;
         [Header("UI Buttons")]
         public GameObject photoButton;
-        [Header("UI Panels")]
-        public MapViewController mapView;
-        public GameObject localizeInfoPanel;    
-        public TMP_Text localizeInfoText;
 
         private void Awake()
         {
@@ -38,48 +34,41 @@ namespace ARJourneyIntoMovies.UI
         /// Called when "Localize" button is clicked
         /// TODO: Step 4 - Implement actual camera capture from ARCameraManager
         /// </summary>
-        public void OnClickLocalize()
-        {
-            // 打开地图 Panel
-            if (mapView != null)
-            {
-                mapView.gameObject.SetActive(true);
-                mapView.ShowMap();
-            }
-            
-            Debug.Log("[ButtonEvents] OnClickLocalize called");
+        // public void OnClickLocalize()
+        // {   
+        //     Debug.Log("[ButtonEvents] OnClickLocalize called");
 
-            if (canvasHUD != null)
-                canvasHUD.SetStatus("Localizing...");
+        //     if (canvasHUD != null)
+        //         canvasHUD.SetStatus("Localizing...");
 
-            if (serverClient == null)
-            {
-                Debug.LogError("[ButtonEvents] ServerClient reference is null!");
-                return;
-            }
+        //     if (serverClient == null)
+        //     {
+        //         Debug.LogError("[ButtonEvents] ServerClient reference is null!");
+        //         return;
+        //     }
 
-            if (uploader == null)
-            {
-                Debug.LogError("[ButtonEvents] ARFrameUploaderV2 reference is null!");
-                return;
-            }
+        //     if (uploader == null)
+        //     {
+        //         Debug.LogError("[ButtonEvents] ARFrameUploaderV2 reference is null!");
+        //         return;
+        //     }
 
-            // // ⭐⭐⭐ 启动 ARFrameUploader 自动上传
-            // uploader.enabled = true;
-            // ⭐ 显示拍照按钮
-            // if (photoButton != null)
-            //     photoButton.SetActive(true);
-            // // ⭐ 显示提示用户开始拍照的面板
-            // if (localizeInfoPanel != null)
-            // {
-            //     localizeInfoPanel.SetActive(true);
+        //     // // ⭐⭐⭐ 启动 ARFrameUploader 自动上传
+        //     // uploader.enabled = true;
+        //     // ⭐ 显示拍照按钮
+        //     // if (photoButton != null)
+        //     //     photoButton.SetActive(true);
+        //     // // ⭐ 显示提示用户开始拍照的面板
+        //     // if (localizeInfoPanel != null)
+        //     // {
+        //     //     localizeInfoPanel.SetActive(true);
 
-            //     if (localizeInfoText != null)
-            //         localizeInfoText.text = "Connecting to server..."; // 👈 你需要的文本
-            // }
+        //     //     if (localizeInfoText != null)
+        //     //         localizeInfoText.text = "Connecting to server..."; // 👈 你需要的文本
+        //     // }
 
-            Debug.Log("[ButtonEvents] Localization started — ARFrameUploaderV2 enabled.");
-        }
+        //     Debug.Log("[ButtonEvents] Localization started — ARFrameUploaderV2 enabled.");
+        // }
 
         /// <summary>
         /// Called when "Test Overlay" button is clicked
@@ -132,5 +121,18 @@ namespace ARJourneyIntoMovies.UI
         /// <summary>
         /// Test button - trigger mock server response
         /// </summary>
+        public void OnClickTestServerResponse()
+        {
+            Debug.Log("[ButtonEvents] OnClickTestServerResponse called");
+
+            if (serverClient != null)
+            {
+                serverClient.TriggerMockResponse();
+            }
+            else
+            {
+                Debug.LogWarning("[ButtonEvents] ServerClient reference is null!");
+            }
+        }
     }
 }

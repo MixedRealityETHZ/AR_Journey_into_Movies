@@ -33,6 +33,7 @@ namespace ARJourneyIntoMovies.Server
         // down stream (server / SfM��use OpenCV/+Z coordinate
         [SerializeField] private bool convertToOpenCVCamera = false;
         [SerializeField] private bool verboseLog = true; 
+        public System.Action OnCaptureStarted;
 
         void Awake()
         {
@@ -87,6 +88,7 @@ namespace ARJourneyIntoMovies.Server
         public void CaptureOneFrame()
         {
             if (verboseLog) Debug.Log("[ManualCapture] User requested capture.");
+            OnCaptureStarted?.Invoke();
 
             StartCoroutine(CaptureAndUpload());
         }

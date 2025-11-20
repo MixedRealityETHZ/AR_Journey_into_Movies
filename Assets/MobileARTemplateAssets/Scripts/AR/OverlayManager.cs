@@ -168,6 +168,35 @@ namespace ARJourneyIntoMovies.AR
 
             Debug.Log("[OverlayManager] Overlay shown with REAL test photo");
         }
+        public void OnSelectPhoto()
+        {
+            PickImageFromGallery();
+        }
+
+        private void PickImageFromGallery()
+        {
+            // 调用 NativeGallery
+            NativeGallery.GetImageFromGallery((path) =>
+            {
+                if (path == null)
+                {
+                    Debug.Log("User cancelled picking image");
+                    return;
+                }
+
+                // 加载图片为 Texture2D
+                Texture2D texture = NativeGallery.LoadImageAtPath(path, 2048);
+                if (texture == null)
+                {
+                    Debug.LogError("Failed to load texture");
+                    return;
+                }
+
+                // 显示 overlay
+                ShowOverlay(texture, defaultAlpha);
+
+            }, "Select a photo");
+        }
 
         /// <summary>
         /// Hide overlay and return to guidance mode

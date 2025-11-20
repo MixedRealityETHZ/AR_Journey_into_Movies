@@ -79,7 +79,7 @@ public class IPPanelController : MonoBehaviour
 
             yield return www.SendWebRequest();
 
-            // 一定要先关闭 loading
+            // 先关闭 loading
             iconLoading.gameObject.SetActive(false);
 
             // ===== 情况 1：网络失败 / 超时 =====
@@ -89,22 +89,11 @@ public class IPPanelController : MonoBehaviour
 
                 iconFail.gameObject.SetActive(true);
                 iconSuccess.gameObject.SetActive(false);
-                yield break;
-            }
-
-            // ===== 情况 2：HTTP 成功 =====
-            if (www.responseCode == 200)
-            {
-                iconSuccess.gameObject.SetActive(true);
-                iconFail.gameObject.SetActive(false);
             }
             else
             {
-                // HTTP 非 200 = 失败
-                Debug.LogWarning("[IPPanel] Ping response non-200: " + www.responseCode);
-
-                iconFail.gameObject.SetActive(true);
-                iconSuccess.gameObject.SetActive(false);
+                iconSuccess.gameObject.SetActive(true);
+                iconFail.gameObject.SetActive(false);
             }
         }
     }
