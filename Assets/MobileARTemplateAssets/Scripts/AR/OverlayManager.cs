@@ -50,6 +50,8 @@ namespace ARJourneyIntoMovies.AR
 
         // Current alpha value
         private float currentAlpha = 0.5f;
+        private Texture2D MovieFrameTexture;
+        private bool isPhotoSelected = false;
 
         private void Awake()
         {
@@ -149,24 +151,12 @@ namespace ARJourneyIntoMovies.AR
         {
             // Create a placeholder texture (gradient)
             Texture2D placeholder = CreatePlaceholderTexture(1920, 1080);
-            ShowOverlay(placeholder, defaultAlpha);
+            if (!isPhotoSelected)
+                ShowOverlay(placeholder, defaultAlpha);
+            else
+                ShowOverlay(MovieFrameTexture, defaultAlpha);
 
             Debug.Log("[OverlayManager] Overlay shown with placeholder texture");
-        }
-        public void ShowOverlayWithTestPhoto()
-        {
-            // Load test image from Resources folder
-            Texture2D photo = Resources.Load<Texture2D>("test_frame");
-
-            if (photo == null)
-            {
-                Debug.LogError("[OverlayManager] Failed to load test_frame.jpg from Resources!");
-                return;
-            }
-
-            ShowOverlay(photo, defaultAlpha);
-
-            Debug.Log("[OverlayManager] Overlay shown with REAL test photo");
         }
         public void OnSelectPhoto()
         {
@@ -192,8 +182,10 @@ namespace ARJourneyIntoMovies.AR
                     return;
                 }
 
-                // 显示 overlay
-                ShowOverlay(texture, defaultAlpha);
+                MovieFrameTexture = texture;
+                isPhotoSelected = true;
+                // // 显示 overlay
+                // ShowOverlay(texture, defaultAlpha);
 
             }, "Select a photo");
         }

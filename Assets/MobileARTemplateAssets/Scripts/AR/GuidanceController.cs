@@ -50,7 +50,7 @@ namespace ARJourneyIntoMovies.AR
 
         [Header("Thresholds")]
         [Tooltip("Distance threshold to switch to overlay mode (meters)")]
-        public float overlayDistanceThreshold = 0.5f;
+        public float overlayDistanceThreshold = 0.2f;
 
         [Tooltip("Angle threshold (yaw) to switch to overlay mode (degrees)")]
         public float overlayAngleThreshold = 6f;
@@ -372,7 +372,7 @@ namespace ARJourneyIntoMovies.AR
             if (overlayManager != null)
             {
                 // overlayManager.ShowOverlayWithPlaceholder();
-                overlayManager.ShowOverlayWithTestPhoto();
+                overlayManager.ShowOverlayWithPlaceholder();
             }
             else
             {
