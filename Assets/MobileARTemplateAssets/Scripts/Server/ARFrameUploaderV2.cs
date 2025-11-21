@@ -28,12 +28,14 @@ namespace ARJourneyIntoMovies.Server
     {
         [SerializeField] private ARCameraManager cameraManager;
         [SerializeField] public ServerClient serverClient; 
+        [SerializeField] private float captureInterval = 3f;
         public string serverUrl;
 
         // down stream (server / SfM��use OpenCV/+Z coordinate
         [SerializeField] private bool convertToOpenCVCamera = false;
         [SerializeField] private bool verboseLog = true; 
         public System.Action OnCaptureStarted;
+        private float timer = 0f;
 
         void Awake()
         {
@@ -43,7 +45,14 @@ namespace ARJourneyIntoMovies.Server
 
         void Update()
         {
- 
+            timer += Time.deltaTime;
+            if (timer >= captureInterval)
+            {
+                timer = 0f;
+                if (verboseLog) Debug.Log($"[ARFU] tick �� try capture (interval={captureInterval}s)");
+                OnCaptureStarted?.Invoke();
+                StartCoroutine(CaptureAndUpload());
+            }
         }
         
         void OnEnable()

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 namespace ARJourneyIntoMovies.AR
 {
@@ -52,6 +53,8 @@ namespace ARJourneyIntoMovies.AR
         private float currentAlpha = 0.5f;
         private Texture2D MovieFrameTexture;
         private bool isPhotoSelected = false;
+        private LongPressDetector longPress;
+        public GameObject personPrefab;
 
         private void Awake()
         {
@@ -80,6 +83,9 @@ namespace ARJourneyIntoMovies.AR
             {
                 returnButton.onClick.AddListener(OnReturnButtonClicked);
             }
+
+            longPress = overlayImage.gameObject.AddComponent<LongPressDetector>();
+            longPress.onLongPress = OnLongPressMovieFrame;
         }
 
         private void OnDestroy()
@@ -367,6 +373,60 @@ namespace ARJourneyIntoMovies.AR
             Debug.Log("[OverlayManager] Return button clicked!");
             Debug.Log("========================================");
             HideOverlay();
+        }
+
+        private void OnLongPressMovieFrame()
+        {
+            Debug.Log("[OverlayManager] Long press detected, spawning PNG in world...");
+
+            StartCoroutine(TransitionToARPerson());
+        }
+
+        private IEnumerator TransitionToARPerson()
+        {
+            float duration = 0.6f;
+            float t = 0;
+
+            CanvasGroup cg = overlayImage.GetComponent<CanvasGroup>();
+            if (cg == null)
+                cg = overlayImage.gameObject.AddComponent<CanvasGroup>();
+
+            while (t < duration)
+            {
+                t += Time.deltaTime;
+                cg.alpha = Mathf.Lerp(1f, 0f, t / duration);
+                yield return null;
+            }
+
+            overlayImage.gameObject.SetActive(false);
+
+            SpawnPersonInWorld();
+        }
+
+        private void SpawnPersonInWorld()
+        {
+            if (personPrefab == null)
+            {
+                Debug.LogError("personPrefab not assigned!");
+                return;
+            }
+
+            // 克隆一个人物
+            GameObject go = Instantiate(personPrefab);
+
+            // 启用
+            go.SetActive(true);
+
+            // 放到 1m 前方
+            Transform cam = Camera.main.transform;
+            go.transform.position = cam.position + cam.forward * 1.0f;
+
+            // 只让 Y 轴旋转面向用户（避免倾斜）
+            Vector3 look = cam.position;
+            look.y = go.transform.position.y;
+            go.transform.LookAt(look);
+
+            Debug.Log("[OverlayManager] Person prefab spawned.");
         }
     }
 }

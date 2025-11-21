@@ -53,6 +53,7 @@ public class IPPanelController : MonoBehaviour
             frameUploader.serverUrl = ip + "/upload";
 
         IPPanel.SetActive(false);
+        frameUploader.enabled = true;
     }
 
     private void OnTestClicked()

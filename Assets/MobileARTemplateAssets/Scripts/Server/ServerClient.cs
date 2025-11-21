@@ -51,13 +51,7 @@ namespace ARJourneyIntoMovies.Server
 
             if (!raw.success)
             {
-                string reason = string.IsNullOrEmpty(raw.reason)
-                    ? "Localization not ready. Please continue capturing."
-                    : raw.reason;
-
-                Debug.LogWarning("[ServerClient] Server returned success=false: " + reason);
-
-                OnError?.Invoke(reason);
+                OnError?.Invoke(raw.reason);
                 return;
             }
 
@@ -95,7 +89,7 @@ namespace ARJourneyIntoMovies.Server
             {
                 success = true,
                 rotation = new float[] { 1f, 0f, 0f, 0f }, // w, x, y, z (identity rotation)
-                translation = new float[] { 0f, 0f, 2f },   // x, y, z (2m forward)
+                translation = new float[] { 0f, 0f, 0f },   // x, y, z (2m forward)
                 fov = 60f,
                 aspect = 9f / 16f,
                 movie_frame_id = "mock_frame_001",
