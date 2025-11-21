@@ -82,6 +82,7 @@
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/PhotoController.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/UI/RotateIcon.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/GoalManager.cs" />
+    <Compile Include="Assets/MobileARTemplateAssets/Scripts/UI/OrientationHint.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/UI/CanvasHUD.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/UI/OverlayUI.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/Server/ServerClient.cs" />
