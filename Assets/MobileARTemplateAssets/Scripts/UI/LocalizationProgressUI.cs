@@ -8,7 +8,7 @@ public class LocalizationProgressUI : MonoBehaviour
     public ServerClient serverClient;
 
     [Header("Uploader")]
-    public ARFrameUploaderV2 uploader;
+    public ARFrameUploader uploader;
 
     [Header("UI")]
     public GameObject progressPanel;

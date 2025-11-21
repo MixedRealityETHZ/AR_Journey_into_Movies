@@ -13,7 +13,7 @@ namespace ARJourneyIntoMovies.UI
     public class ButtonEvents : MonoBehaviour
     {
         [Header("Manager References")]
-        public ARFrameUploaderV2 uploader;
+        public ARFrameUploader uploader;
         public ServerClient serverClient;
         public PoseFusion poseFusion;
         public GuidanceController guidanceController;
@@ -54,7 +54,7 @@ namespace ARJourneyIntoMovies.UI
             }
 
             // ⭐⭐⭐ 启动 ARFrameUploader 自动上传
-            uploader.enabled = true;
+            // uploader.enabled = true;
             // ⭐ 显示拍照按钮
             // if (photoButton != null)
             //     photoButton.SetActive(true);

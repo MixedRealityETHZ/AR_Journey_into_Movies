@@ -59,7 +59,7 @@
     <UnityVersion>2022.3.62f2</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Analyzer Include="/Users/caizhihao/.vscode/extensions/visualstudiotoolsforunity.vstuc-1.1.3/Analyzers/Microsoft.Unity.Analyzers.dll" />
+    <Analyzer Include="/Users/caizhihao/.vscode/extensions/visualstudiotoolsforunity.vstuc-1.2.0/Analyzers/Microsoft.Unity.Analyzers.dll" />
     <Analyzer Include="/Applications/Unity/Hub/Editor/2022.3.62f2/Unity.app/Contents/Tools/Unity.SourceGenerators/Unity.SourceGenerators.dll" />
     <Analyzer Include="/Applications/Unity/Hub/Editor/2022.3.62f2/Unity.app/Contents/Tools/Unity.SourceGenerators/Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
@@ -76,7 +76,7 @@
     <Compile Include="Assets/MobileARTemplateAssets/UI/Scripts/CutoutMaskUI.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/ARTemplateMenuManager.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/ARFeatheredPlaneMeshVisualizerCompanion.cs" />
-    <Compile Include="Assets/MobileARTemplateAssets/Scripts/Server/ARFrameUploaderV2.cs" />
+    <Compile Include="Assets/MobileARTemplateAssets/Scripts/Server/ARFrameUploader.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/GuidanceTest.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/MapViewController.cs" />
     <Compile Include="Assets/MobileARTemplateAssets/Scripts/AR/PhotoController.cs" />
