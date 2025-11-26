@@ -13,6 +13,7 @@ namespace ARJourneyIntoMovies.AR
         [Header("UI References")]
         [Tooltip("Overlay Canvas (Screen Space - Overlay)")]
         public Canvas overlayCanvas;
+        public Canvas OriginCanvas;
 
         [Tooltip("RawImage for full-screen movie frame display")]
         public RawImage overlayImage;
@@ -139,6 +140,7 @@ namespace ARJourneyIntoMovies.AR
             }
 
             // Show canvas
+            OriginCanvas.gameObject.SetActive(false);
             overlayCanvas.gameObject.SetActive(true);
             isOverlayActive = true;
 
@@ -215,6 +217,7 @@ namespace ARJourneyIntoMovies.AR
             }
 
             isOverlayActive = false;
+            OriginCanvas.gameObject.SetActive(true);
 
             // Show guidance elements
             ShowGuidanceElements();
