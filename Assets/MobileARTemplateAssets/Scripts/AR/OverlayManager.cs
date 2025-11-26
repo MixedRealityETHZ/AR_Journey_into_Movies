@@ -13,12 +13,14 @@ namespace ARJourneyIntoMovies.AR
         [Header("UI References")]
         [Tooltip("Overlay Canvas (Screen Space - Overlay)")]
         public Canvas overlayCanvas;
+        public Canvas OriginCanvas;
 
         [Tooltip("RawImage for full-screen movie frame display")]
         public RawImage overlayImage;
 
         [Tooltip("Slider for alpha control")]
         public Slider alphaSlider;
+        public GameObject spawnedPerson;  
 
         [Tooltip("Button to return to guidance mode")]
         public Button returnButton;
@@ -53,8 +55,8 @@ namespace ARJourneyIntoMovies.AR
         private float currentAlpha = 0.5f;
         private Texture2D MovieFrameTexture;
         private bool isPhotoSelected = false;
-        private LongPressDetector longPress;
-        public GameObject personPrefab;
+        private LongPressDetector ImageLongPress;
+        private bool isPersonVisible = false;
 
         private void Awake()
         {
@@ -84,8 +86,8 @@ namespace ARJourneyIntoMovies.AR
                 returnButton.onClick.AddListener(OnReturnButtonClicked);
             }
 
-            longPress = overlayImage.gameObject.AddComponent<LongPressDetector>();
-            longPress.onLongPress = OnLongPressMovieFrame;
+            ImageLongPress = overlayImage.gameObject.AddComponent<LongPressDetector>();
+            ImageLongPress.onLongPress = OnLongPressToggle;
         }
 
         private void OnDestroy()
@@ -138,6 +140,7 @@ namespace ARJourneyIntoMovies.AR
             }
 
             // Show canvas
+            OriginCanvas.gameObject.SetActive(false);
             overlayCanvas.gameObject.SetActive(true);
             isOverlayActive = true;
 
@@ -214,6 +217,7 @@ namespace ARJourneyIntoMovies.AR
             }
 
             isOverlayActive = false;
+            OriginCanvas.gameObject.SetActive(true);
 
             // Show guidance elements
             ShowGuidanceElements();
@@ -375,14 +379,21 @@ namespace ARJourneyIntoMovies.AR
             HideOverlay();
         }
 
-        private void OnLongPressMovieFrame()
+        private void OnLongPressToggle()
         {
-            Debug.Log("[OverlayManager] Long press detected, spawning PNG in world...");
-
-            StartCoroutine(TransitionToARPerson());
+            if (!isPersonVisible)
+            {
+                // 电影帧 → 人物
+                StartCoroutine(TransitionOverlayToPerson());
+            }
+            else
+            {
+                // 人物 → 电影帧
+                StartCoroutine(TransitionPersonToOverlay());
+            }
         }
 
-        private IEnumerator TransitionToARPerson()
+        private IEnumerator TransitionOverlayToPerson()
         {
             float duration = 0.6f;
             float t = 0;
@@ -391,28 +402,78 @@ namespace ARJourneyIntoMovies.AR
             if (cg == null)
                 cg = overlayImage.gameObject.AddComponent<CanvasGroup>();
 
+            spawnedPerson = SpawnPersonInWorld();
+            Renderer rend = spawnedPerson.GetComponentInChildren<Renderer>();
+            Material mat = rend.material;
+            Color mc = mat.color;
+            mc.a = 0f;                   // 从透明开始
+            mat.color = mc;
+
             while (t < duration)
             {
                 t += Time.deltaTime;
-                cg.alpha = Mathf.Lerp(1f, 0f, t / duration);
+                float v = t / duration;
+
+                // Overlay 从 1 → 0
+                cg.alpha = Mathf.Lerp(1f, 0f, v);
+
+                // Person 从 0 → 1
+                mc.a = Mathf.Lerp(0f, 1f, v);
+                mat.color = mc;
+
                 yield return null;
             }
-
-            overlayImage.gameObject.SetActive(false);
-
-            SpawnPersonInWorld();
+            // overlayImage.gameObject.SetActive(false);
+            isPersonVisible = true; 
         }
 
-        private void SpawnPersonInWorld()
+        private IEnumerator TransitionPersonToOverlay()
         {
-            if (personPrefab == null)
+            float duration = 0.8f;
+            float t = 0;
+
+            if (spawnedPerson == null)
+                yield break;
+
+            Renderer rend = spawnedPerson.GetComponentInChildren<Renderer>();
+            Material mat = rend.material;
+            Color mc = mat.color;
+
+            // 准备 Overlay 重新出现
+            overlayImage.gameObject.SetActive(true);
+            CanvasGroup cg = overlayImage.GetComponent<CanvasGroup>();
+            if (cg == null)
+                cg = overlayImage.gameObject.AddComponent<CanvasGroup>();
+            cg.alpha = 0f;
+
+            while (t < duration)
+            {
+                t += Time.deltaTime;
+                float v = t / duration;
+
+                // 人物渐隐
+                mc.a = Mathf.Lerp(1f, 0f, v);
+                mat.color = mc;
+
+                // Overlay 渐显
+                cg.alpha = Mathf.Lerp(0f, 0.5f, v);
+
+                yield return null;
+            }
+            spawnedPerson.SetActive(false);
+            isPersonVisible = false; 
+        }
+
+        private GameObject SpawnPersonInWorld()
+        {
+            if (spawnedPerson == null)
             {
                 Debug.LogError("personPrefab not assigned!");
-                return;
+                return null;
             }
 
             // 克隆一个人物
-            GameObject go = Instantiate(personPrefab);
+            GameObject go = Instantiate(spawnedPerson);
 
             // 启用
             go.SetActive(true);
@@ -426,7 +487,7 @@ namespace ARJourneyIntoMovies.AR
             look.y = go.transform.position.y;
             go.transform.LookAt(look);
 
-            Debug.Log("[OverlayManager] Person prefab spawned.");
+            return go;
         }
     }
 }

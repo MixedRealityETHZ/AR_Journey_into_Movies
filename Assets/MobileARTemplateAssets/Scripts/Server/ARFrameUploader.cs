@@ -24,7 +24,7 @@ namespace ARJourneyIntoMovies.Server
     }
 
     [RequireComponent(typeof(ARCameraManager))]
-    public class ARFrameUploaderV2 : MonoBehaviour
+    public class ARFrameUploader : MonoBehaviour
     {
         [SerializeField] private ARCameraManager cameraManager;
         [SerializeField] public ServerClient serverClient; 
@@ -94,13 +94,13 @@ namespace ARJourneyIntoMovies.Server
         // }
 
         // 📸 公开给 UI 按钮的函数
-        public void CaptureOneFrame()
-        {
-            if (verboseLog) Debug.Log("[ManualCapture] User requested capture.");
-            OnCaptureStarted?.Invoke();
+        // public void CaptureOneFrame()
+        // {
+        //     if (verboseLog) Debug.Log("[ManualCapture] User requested capture.");
+        //     OnCaptureStarted?.Invoke();
 
-            StartCoroutine(CaptureAndUpload());
-        }
+        //     StartCoroutine(CaptureAndUpload());
+        // }
 
         private IEnumerator CaptureAndUpload()
         {

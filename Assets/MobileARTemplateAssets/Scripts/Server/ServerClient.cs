@@ -89,7 +89,7 @@ namespace ARJourneyIntoMovies.Server
             {
                 success = true,
                 rotation = new float[] { 1f, 0f, 0f, 0f }, // w, x, y, z (identity rotation)
-                translation = new float[] { 0f, 0f, 0f },   // x, y, z (2m forward)
+                translation = new float[] { 0f, 0f, 0.1f },   // x, y, z (2m forward)
                 fov = 60f,
                 aspect = 9f / 16f,
                 movie_frame_id = "mock_frame_001",
