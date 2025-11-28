@@ -8,7 +8,7 @@ using System.IO;
 public class MovieSceneFrameController : MonoBehaviour
 {
     // =========================================================
-    //  Êý¾Ý½á¹¹
+    //  ï¿½ï¿½ï¿½Ý½á¹¹
     // =========================================================
     [System.Serializable]
     public class MovieData
@@ -38,13 +38,13 @@ public class MovieSceneFrameController : MonoBehaviour
     public Button confirmFrameButton;
 
     // =========================================================
-    //  Inspector ÍÏ×§Ïî
+    //  Inspector ï¿½ï¿½×§ï¿½ï¿½
     // =========================================================
     [Header("Panels")]
     public GameObject moviePanel;
     public GameObject scenePanel;
     public GameObject framePanel;
-    public GameObject arPanel;
+    // public GameObject arPanel;
 
     [Header("Contents")]
     public Transform movieContent;
@@ -61,7 +61,7 @@ public class MovieSceneFrameController : MonoBehaviour
     public Button nextFromSceneButton;
 
     // =========================================================
-    // ÄÚ²¿Êý¾Ý
+    // ï¿½Ú²ï¿½ï¿½ï¿½ï¿½ï¿½
     // =========================================================
     private List<MovieData> movies = new List<MovieData>();
     private MovieData currentMovie;
@@ -74,7 +74,7 @@ public class MovieSceneFrameController : MonoBehaviour
 
 
     // =========================================================
-    //  Æô¶¯Âß¼­
+    //  ï¿½ï¿½ï¿½ï¿½ï¿½ß¼ï¿½
     // =========================================================
     void Start()
     {
@@ -90,7 +90,7 @@ public class MovieSceneFrameController : MonoBehaviour
 
 
     // =========================================================
-    //  ×Ô¶¯¼ÓÔØ Resources/Movies ÏÂµÄËùÓÐÍ¼Æ¬
+    //  ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½ Resources/Movies ï¿½Âµï¿½ï¿½ï¿½ï¿½ï¿½Í¼Æ¬
     // =========================================================
     void LoadAllMoviesFromResources()
     {
@@ -104,10 +104,10 @@ public class MovieSceneFrameController : MonoBehaviour
             MovieData movie = new MovieData();
             movie.name = movieFolder.Name;
 
-            // µçÓ°·âÃæ
+            // ï¿½ï¿½Ó°ï¿½ï¿½ï¿½ï¿½
             movie.filmecover = Resources.Load<Sprite>($"Movies/{movie.name}/cover");
 
-            // ³¡¾°Ä¿Â¼
+            // ï¿½ï¿½ï¿½ï¿½Ä¿Â¼
             string scenePath = Path.Combine(movieFolder.FullName, "Scenes");
             DirectoryInfo sceneDir = new DirectoryInfo(scenePath);
 
@@ -116,12 +116,12 @@ public class MovieSceneFrameController : MonoBehaviour
                 SceneData scene = new SceneData();
                 scene.name = sceneFolder.Name;
 
-                // Scene µÄ·âÃæ£¨thumbnail.png£©
+                // Scene ï¿½Ä·ï¿½ï¿½æ£¨thumbnail.pngï¿½ï¿½
                 scene.scenecover = Resources.Load<Sprite>(
                     $"Movies/{movie.name}/Scenes/{scene.name}/thumbnail"
                 );
 
-                // ¼ÓÔØËùÓÐ frame Í¼
+                // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ frame Í¼
                 FileInfo[] frameFiles = sceneFolder.GetFiles("*.png");
 
                 foreach (FileInfo frameFile in frameFiles)
@@ -146,14 +146,14 @@ public class MovieSceneFrameController : MonoBehaviour
     }
 
     // =========================================================
-    // UI ÇÐ»»£ºMovie ¡ú Scene ¡ú Frame ¡ú AR
+    // UI ï¿½Ð»ï¿½ï¿½ï¿½Movie ï¿½ï¿½ Scene ï¿½ï¿½ Frame ï¿½ï¿½ AR
     // =========================================================
     public void ShowMoviePanel()
     {
-        moviePanel.SetActive(true);
+        moviePanel.SetActive(false);
         scenePanel.SetActive(false);
         framePanel.SetActive(false);
-        arPanel.SetActive(false);
+        // arPanel.SetActive(false);
 
         PopulateMovies();
     }
@@ -225,7 +225,7 @@ public class MovieSceneFrameController : MonoBehaviour
 
     void OnConfirmFrameSelected()
     {
-        arPanel.SetActive(true);
+        // arPanel.SetActive(true);
         moviePanel.SetActive(false);
         scenePanel.SetActive(false);
         framePanel.SetActive(false);
@@ -242,12 +242,12 @@ public class MovieSceneFrameController : MonoBehaviour
 
         Debug.Log($"CONFIRMED:\nMovie = {movieName}\nScene = {sceneName}\nFrame = {frameId}");
 
-        // TODO: ÔÚÕâÀï°ÑÈý¸öÖµ´«¸øÄãµÄ AR ¹¦ÄÜ
+        // TODO: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ AR ï¿½ï¿½ï¿½ï¿½
     }
 
 
     // =========================================================
-    // ¹¤¾ßº¯Êý
+    // ï¿½ï¿½ï¿½ßºï¿½ï¿½ï¿½
     // =========================================================
     void ClearContent(Transform content)
     {
