@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using ARJourneyIntoMovies.Server;
 
 namespace ARJourneyIntoMovies.AR
 {
@@ -44,6 +45,9 @@ namespace ARJourneyIntoMovies.AR
 
         [Tooltip("TargetFrustumVisualizer to hide/show frustum")]
         public TargetFrustumVisualizer frustumVisualizer;
+        public URPFilterSwitcher filterSwitcher;
+        public ARFrameUploader uploader;
+        public MovieSceneFrameController movieSceneFrameController;
 
         [Header("Debug")]
         [SerializeField] private bool showDebugInfo = false;
@@ -103,6 +107,61 @@ namespace ARJourneyIntoMovies.AR
                 returnButton.onClick.RemoveListener(OnReturnButtonClicked);
             }
         }
+
+        public void setMovieFrame()
+        {
+            var info = movieSceneFrameController.GetSelectedFrameInfo();
+            Texture2D texture = info.frameTexture;
+            if (texture == null)
+                return;
+
+            Texture2D readableTex = MakeReadable(texture);
+            Texture2D rotated = RotateTexture90(readableTex);
+            MovieFrameTexture = rotated;
+            isPhotoSelected = true;
+        }
+
+        private Texture2D RotateTexture90(Texture2D src)
+        {
+            int width = src.width;
+            int height = src.height;
+            Texture2D dst = new Texture2D(height, width, src.format, false);
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    dst.SetPixel(y, width - 1 - x, src.GetPixel(x, y));
+                }
+            }
+
+            dst.Apply();
+            return dst;
+        }
+        private Texture2D MakeReadable(Texture2D nonReadableTexture)
+        {
+            RenderTexture rt = RenderTexture.GetTemporary(
+                nonReadableTexture.width,
+                nonReadableTexture.height,
+                0,
+                RenderTextureFormat.Default,
+                RenderTextureReadWrite.Linear);
+
+            Graphics.Blit(nonReadableTexture, rt);
+
+            RenderTexture previous = RenderTexture.active;
+            RenderTexture.active = rt;
+
+            Texture2D readableTex = new Texture2D(nonReadableTexture.width, nonReadableTexture.height, TextureFormat.RGBA32, false);
+            readableTex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
+            readableTex.Apply();
+
+            RenderTexture.active = previous;
+            RenderTexture.ReleaseTemporary(rt);
+
+            return readableTex;
+        }
+
 
         /// <summary>
         /// Show overlay with movie frame texture
@@ -166,37 +225,6 @@ namespace ARJourneyIntoMovies.AR
                 ShowOverlay(MovieFrameTexture, defaultAlpha);
 
             Debug.Log("[OverlayManager] Overlay shown with placeholder texture");
-        }
-        public void OnSelectPhoto()
-        {
-            PickImageFromGallery();
-        }
-
-        private void PickImageFromGallery()
-        {
-            // 调用 NativeGallery
-            NativeGallery.GetImageFromGallery((path) =>
-            {
-                if (path == null)
-                {
-                    Debug.Log("User cancelled picking image");
-                    return;
-                }
-
-                // 加载图片为 Texture2D
-                Texture2D texture = NativeGallery.LoadImageAtPath(path, 2048);
-                if (texture == null)
-                {
-                    Debug.LogError("Failed to load texture");
-                    return;
-                }
-
-                MovieFrameTexture = texture;
-                isPhotoSelected = true;
-                // // 显示 overlay
-                // ShowOverlay(texture, defaultAlpha);
-
-            }, "Select a photo");
         }
 
         /// <summary>
@@ -376,6 +404,8 @@ namespace ARJourneyIntoMovies.AR
             Debug.Log("========================================");
             Debug.Log("[OverlayManager] Return button clicked!");
             Debug.Log("========================================");
+            filterSwitcher.DisableAllFilters();
+
             HideOverlay();
         }
 

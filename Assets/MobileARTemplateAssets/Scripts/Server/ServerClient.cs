@@ -16,6 +16,8 @@ namespace ARJourneyIntoMovies.Server
         public bool success;
         public SessionPose session_pose;
         public string reason;
+        public bool isFromAlbum;
+        public bool firstAlbumFrame;
     }
     /// <summary>
     /// Client for communicating with HLoc server (localization service)
@@ -25,10 +27,13 @@ namespace ARJourneyIntoMovies.Server
     {
         [Header("UI References")]
         public GameObject hudPanel;
+        public ARFrameUploader uploader;
 
         // Events (cannot use [Header] attribute on events)
         public event Action<PoseData> OnPoseReceived;
         public event Action<string> OnError;
+        public event Action OnAlbumFirstFrameProcessed;
+        private bool albumFirstProcessed = false;
 
         private void Awake()
         {
@@ -52,6 +57,11 @@ namespace ARJourneyIntoMovies.Server
             if (!raw.success)
             {
                 OnError?.Invoke(raw.reason);
+                if (!albumFirstProcessed)
+                {
+                    albumFirstProcessed = true;
+                    OnAlbumFirstFrameProcessed?.Invoke();
+                }
                 return;
             }
 
@@ -75,6 +85,7 @@ namespace ARJourneyIntoMovies.Server
 
             Debug.Log($"[ServerClient] Final PoseData → T={pose.GetTranslation()}, R={pose.GetRotation().eulerAngles}");
 
+            uploader.enabled = false;
             OnPoseReceived?.Invoke(pose);
         }
 

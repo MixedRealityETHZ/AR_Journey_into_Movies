@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.IO;
+using ARJourneyIntoMovies.AR;
+using ARJourneyIntoMovies.Server;
 
 
 public class MovieSceneFrameController : MonoBehaviour
@@ -44,6 +46,8 @@ public class MovieSceneFrameController : MonoBehaviour
     public GameObject moviePanel;
     public GameObject scenePanel;
     public GameObject framePanel;
+    public GameObject ChooseFramePanel;
+    public OverlayManager overlayManager;
     // public GameObject arPanel;
 
     [Header("Contents")]
@@ -59,6 +63,9 @@ public class MovieSceneFrameController : MonoBehaviour
     [Header("Next Buttons")]
     public Button nextFromMovieButton;
     public Button nextFromSceneButton;
+    public Button ButtonAlbum;
+    public Button ChooseBuiltinImageButton;
+    public Button ChooseAlbumImageButton;
 
     // =========================================================
     // �ڲ�����
@@ -71,6 +78,16 @@ public class MovieSceneFrameController : MonoBehaviour
     private GameObject currentMovieItem;
     private GameObject currentSceneItem;
     private GameObject currentFrameItem;
+    private string movieName;
+    private string sceneName;
+    private string frameId;
+    private Texture2D MovieFrameTexture;
+    private bool isFromAlbum = false;
+
+    public (string movie, string scene, string frame, Texture2D frameTexture, bool fromAlbum) GetSelectedFrameInfo()
+    {
+        return (movieName, sceneName, frameId, MovieFrameTexture, isFromAlbum);
+    }
 
 
     // =========================================================
@@ -82,12 +99,19 @@ public class MovieSceneFrameController : MonoBehaviour
         ShowMoviePanel();
 
         backFromSceneButton.onClick.AddListener(GoToMoviePanel);
-        backFromFrameButton.onClick.AddListener(GoToScenePanel);
+        backFromFrameButton.onClick.AddListener(GoToFrameSelectionPanel);
         confirmFrameButton.onClick.AddListener(OnConfirmFrameSelected);
         nextFromMovieButton.onClick.AddListener(GoToScenePanel);
-        nextFromSceneButton.onClick.AddListener(GoToFramePanel);
+        nextFromSceneButton.onClick.AddListener(GoToFrameSelectionPanel);
+        ButtonAlbum.onClick.AddListener(GoToMoviePanel);
+        ChooseBuiltinImageButton.onClick.AddListener(GoToFramePanel);
+        ChooseAlbumImageButton.onClick.AddListener(OnOpenChooseAlbumPanel);
     }
 
+    void GetFrameInfo()
+    {
+        
+    }
 
     // =========================================================
     //  �Զ����� Resources/Movies �µ�����ͼƬ
@@ -96,51 +120,57 @@ public class MovieSceneFrameController : MonoBehaviour
     {
         movies.Clear();
 
-        string basePath = Path.Combine(Application.dataPath, "Resources/Movies");
-        DirectoryInfo movieDir = new DirectoryInfo(basePath);
+        TextAsset movieListFile = Resources.Load<TextAsset>("movies");
+        string[] lines = movieListFile.text.Split('\n');
+        List<string> movieNames = new List<string>();
+        List<string> sceneNames = new List<string>();
 
-        foreach (DirectoryInfo movieFolder in movieDir.GetDirectories())
+        foreach(string rawLine in lines)
+        {
+            string line = rawLine.Trim();
+            string[] parts = line.Split('/');
+            
+            string movieName = parts[0].Trim();   // '/' 前
+
+            if(!movieNames.Contains(movieName))
+            {
+                movieNames.Add(movieName);
+            }
+            sceneNames.Add(line);  
+        }
+
+        foreach (string movieFolder in movieNames)
         {
             MovieData movie = new MovieData();
-            movie.name = movieFolder.Name;
-
-            // ��Ӱ����
+            movie.name = movieFolder;
             movie.filmecover = Resources.Load<Sprite>($"Movies/{movie.name}/cover");
 
-            // ����Ŀ¼
-            string scenePath = Path.Combine(movieFolder.FullName, "Scenes");
-            DirectoryInfo sceneDir = new DirectoryInfo(scenePath);
-
-            foreach (DirectoryInfo sceneFolder in sceneDir.GetDirectories())
+            foreach (string sceneFolder in sceneNames)
             {
-                SceneData scene = new SceneData();
-                scene.name = sceneFolder.Name;
+                if (!sceneFolder.StartsWith(movieFolder + "/")) continue;
+                string[] parts = sceneFolder.Split('/');
+                string sceneName = parts[1].Trim();
 
-                // Scene �ķ��棨thumbnail.png��
+                SceneData scene = new SceneData();
+                scene.name = sceneName;
+
                 scene.scenecover = Resources.Load<Sprite>(
                     $"Movies/{movie.name}/Scenes/{scene.name}/thumbnail"
                 );
 
-                // �������� frame ͼ
-                FileInfo[] frameFiles = sceneFolder.GetFiles("*.png");
-
-                foreach (FileInfo frameFile in frameFiles)
+                Sprite[] frames = Resources.LoadAll<Sprite>($"Movies/{movie.name}/Scenes/{scene.name}");
+                foreach (var f in frames)
                 {
-                    if (frameFile.Name == "thumbnail.png") continue;
+                    if (f.name.Contains("thumbnail")) continue;
 
-                    FrameData f = new FrameData();
-                    f.id = Path.GetFileNameWithoutExtension(frameFile.Name);
-
-                    f.framesprite = Resources.Load<Sprite>(
-                        $"Movies/{movie.name}/Scenes/{scene.name}/{f.id}"
-                    );
-
-                    scene.frames.Add(f);
+                    FrameData fd = new FrameData();
+                    fd.id = f.name;
+                    fd.framesprite = f;
+                    scene.frames.Add(fd);
                 }
 
                 movie.scenes.Add(scene);
             }
-
             movies.Add(movie);
         }
     }
@@ -153,7 +183,7 @@ public class MovieSceneFrameController : MonoBehaviour
         moviePanel.SetActive(false);
         scenePanel.SetActive(false);
         framePanel.SetActive(false);
-        // arPanel.SetActive(false);
+        ChooseFramePanel.SetActive(false);
 
         PopulateMovies();
     }
@@ -236,13 +266,14 @@ public class MovieSceneFrameController : MonoBehaviour
             return;
         }
 
-        string movieName = currentMovie.name;
-        string sceneName = currentScene.name;
-        string frameId = currentFrame.id;
+        movieName = currentMovie.name;
+        sceneName = currentScene.name;
+        frameId = currentFrame.id;
+        MovieFrameTexture = currentFrame.framesprite.texture;
+        isFromAlbum = false;
+        overlayManager.setMovieFrame();
 
         Debug.Log($"CONFIRMED:\nMovie = {movieName}\nScene = {sceneName}\nFrame = {frameId}");
-
-        // TODO: �����������ֵ������� AR ����
     }
 
 
@@ -266,10 +297,18 @@ public class MovieSceneFrameController : MonoBehaviour
 
     void GoToMoviePanel()
     {
-        scenePanel.SetActive(false);
-        framePanel.SetActive(false);
-        moviePanel.SetActive(true);
-        PopulateMovies();
+        if(moviePanel.activeSelf)
+        {
+            moviePanel.SetActive(false);
+        }
+        else
+        {
+            scenePanel.SetActive(false);
+            framePanel.SetActive(false);
+            moviePanel.SetActive(true);
+            ChooseFramePanel.SetActive(false);
+            PopulateMovies();
+        }
     }
 
     void GoToScenePanel()
@@ -277,6 +316,7 @@ public class MovieSceneFrameController : MonoBehaviour
         framePanel.SetActive(false);
         moviePanel.SetActive(false);
         scenePanel.SetActive(true);
+        ChooseFramePanel.SetActive(false);
         PopulateScenes(currentMovie);
     }
 
@@ -285,11 +325,51 @@ public class MovieSceneFrameController : MonoBehaviour
         framePanel.SetActive(true);
         moviePanel.SetActive(false);
         scenePanel.SetActive(false);
+        ChooseFramePanel.SetActive(false);
         PopulateFrames(currentScene);
     }
 
+    void GoToFrameSelectionPanel()
+    {
+        ChooseFramePanel.SetActive(true);
+        framePanel.SetActive(false);
+        moviePanel.SetActive(false);
+        scenePanel.SetActive(false);
+    }
 
+    private void OnOpenChooseAlbumPanel()
+    {
+        ChooseFramePanel.SetActive(false);
+        PickImageFromGallery();
+    }
 
+    private void PickImageFromGallery()
+    {
+        // 调用 NativeGallery
+        NativeGallery.GetImageFromGallery((path) =>
+        {
+            if (path == null)
+            {
+                Debug.Log("User cancelled picking image");
+                return;
+            }
+
+            // 加载图片为 Texture2D
+            Texture2D texture = NativeGallery.LoadImageAtPath(path, 2048);
+            if (texture == null)
+            {
+                Debug.LogError("Failed to load texture");
+                return;
+            }
+            MovieFrameTexture = texture;
+            movieName = currentMovie.name;
+            sceneName = currentScene.name;
+            frameId = "FromAlbum";
+            isFromAlbum = true;
+
+            overlayManager.setMovieFrame();
+        }, "Select a photo");
+    }
 }
 
 

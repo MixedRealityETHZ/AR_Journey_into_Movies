@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PhotoController : MonoBehaviour
 {
+    [Header("UI")]
+    public GameObject ControlPanel; 
     public void SaveScreenshot()
     {
         StartCoroutine(CaptureAndSave());
@@ -11,6 +13,8 @@ public class PhotoController : MonoBehaviour
 
     private IEnumerator CaptureAndSave()
     {
+        ControlPanel.SetActive(false);
+
         // 等待渲染结束，确保没有空白
         yield return new WaitForEndOfFrame();
 
@@ -26,6 +30,7 @@ public class PhotoController : MonoBehaviour
             "AR_screenshot_" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".png"
         );
 
+        ControlPanel.SetActive(true);
         // 释放内存
         Destroy(tex);
     }

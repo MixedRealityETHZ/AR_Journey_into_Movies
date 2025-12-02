@@ -2,8 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using ARJourneyIntoMovies.Server;
-using UnityEngine.Networking;
-using System.Collections;
 
 public class IPPanelController : MonoBehaviour
 {
@@ -15,6 +13,7 @@ public class IPPanelController : MonoBehaviour
 
     [Header("Targets to Update")]
     public ARFrameUploader frameUploader;
+    public MovieSceneFrameController frameSelect;
     private string remembered_ip;
 
     private void Start()
@@ -29,9 +28,14 @@ public class IPPanelController : MonoBehaviour
     
     public void OpenIPPanel()
     {
+        var info = frameSelect.GetSelectedFrameInfo();
+        Texture2D frameTexture = info.frameTexture;
+        if (frameSelect != null && frameTexture == null)
+        {
+            Debug.LogWarning("No movie frame selected yet.");
+            return;
+        }
         IPPanel.SetActive(true);
-
-        // 默认显示自动 IP（可覆盖）
         inputFieldIP.text = remembered_ip;
     }
 

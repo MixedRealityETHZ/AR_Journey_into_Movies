@@ -5,14 +5,15 @@ using System.Collections;
 public class MapViewController : MonoBehaviour
 {
     [Header("UI Elements")]
-    public RectTransform mapPanel;      // 上方滑动的 panel（显示 Google Maps）
-    public RectTransform hudPanel;      // 引导 HUD 面板（箭头等）
-    public Button mapButton;            // 左下角的主按钮
+    public RectTransform mapPanel;      
+    public RectTransform hudPanel;      
+    public Button mapButton;          
+    public MovieSceneFrameController frameSelect; 
 
-    public Sprite iconMap;              // 地图图标
-    public Sprite iconArrow;            // 箭头图标
+    public Sprite iconMap;            
+    public Sprite iconArrow;          
     public Image ButtonIcon;
-    public WebViewObject webView;       // WebView
+    public WebViewObject webView;      
 
     [Header("Slide Settings")]
     public float slideDuration = 0.35f;
@@ -29,8 +30,8 @@ public class MapViewController : MonoBehaviour
     private Mode currentMode = Mode.Map;
 
     // 目标：46°N, 8°E
-    private const double targetLat = 47.378352;
-    private const double targetLon = 8.548224;
+    private double targetLat = 47.378352;
+    private double targetLon = 8.548224;
     private bool webViewLoaded = false;
 
     void Start()
@@ -46,7 +47,7 @@ public class MapViewController : MonoBehaviour
         hudPanel.anchoredPosition = hudHiddenPos;
 
         mapButton.onClick.AddListener(OnModeToggle);
-        ButtonIcon.sprite = iconMap; // 初始是地图模式
+        ButtonIcon.sprite = iconMap; 
 
         // 创建 WebView
         webView = gameObject.AddComponent<WebViewObject>();
@@ -56,10 +57,18 @@ public class MapViewController : MonoBehaviour
     }
 
     // ========================
-    //  切换：地图 ↔ 箭头
+    //  Toggle: Map ↔ Arrow
     // ========================
     void OnModeToggle()
     {
+        var info = frameSelect.GetSelectedFrameInfo();
+        Texture2D frameTexture = info.frameTexture;
+        if (frameSelect != null && frameTexture == null)
+        {
+            Debug.LogWarning("No movie frame selected yet.");
+            return;
+        }
+
         if (currentMode == Mode.Map)
         {
             SwitchToMapMode();
@@ -71,7 +80,7 @@ public class MapViewController : MonoBehaviour
     }
 
     // ========================
-    //   地图导航模式
+    //   Google Map
     // ========================
     void SwitchToMapMode()
     {
@@ -91,7 +100,7 @@ public class MapViewController : MonoBehaviour
     }
 
     // ========================
-    //   箭头引导模式
+    //   Arrow Guidance
     // ========================
     void SwitchToArrowMode()
     {
@@ -108,9 +117,6 @@ public class MapViewController : MonoBehaviour
         webView.SetVisibility(false);
     }
 
-    // ========================
-    //   通用滑动动画
-    // ========================
     IEnumerator SlideRect(RectTransform rt, Vector2 start, Vector2 end)
     {
         float t = 0f;
@@ -128,7 +134,6 @@ public class MapViewController : MonoBehaviour
         rt.anchoredPosition = end;
     }
 
-    // 更新 WebView 区域
     void UpdateWebViewRect()
     {
         if (webView == null) return;
@@ -168,6 +173,19 @@ public class MapViewController : MonoBehaviour
         if (Input.location.status != LocationServiceStatus.Running)
             yield break;
 
+        var info = frameSelect.GetSelectedFrameInfo();
+        string movie = info.movie;
+
+        if(movie =="ETHz-CAB")
+        {
+            targetLat = 47.378352;
+            targetLon = 8.548224;
+        }
+        else if(movie == "ETHz-HG")
+        {
+            targetLat = 47.376246;
+            targetLon = 8.547045;
+        }
         double userLat = Input.location.lastData.latitude;
         double userLon = Input.location.lastData.longitude;
 
