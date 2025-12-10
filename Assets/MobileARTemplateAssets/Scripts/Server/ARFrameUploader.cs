@@ -46,45 +46,10 @@ namespace ARJourneyIntoMovies.Server
         public Action OnCaptureStarted;
 
         private float timer = 0f;
-
-        // ========= 相册模式控制 =========
-        private bool isAlbumMode = false;               // 当前选中的 frame 是否来自相册
-        private bool albumFirstUploadSent = false;      // 是否已经把“相册第一张”上传给服务器
-        private bool albumFirstProcessedByServer = false; // 服务器是否已经处理完第一张相册图
-        private bool isUploadingNow = false;            // 防止多个协程并发上传
-
         void Awake()
         {
             if (cameraManager == null)
                 cameraManager = GetComponent<ARCameraManager>();
-        }
-
-        void OnEnable()
-        {
-            if (serverClient != null)
-            {
-                // 服务器在“第一张相册图处理完”时调用这个事件
-                serverClient.OnAlbumFirstFrameProcessed += HandleAlbumFirstFrameProcessed;
-            }
-        }
-
-        void OnDisable()
-        {
-            if (serverClient != null)
-            {
-                serverClient.OnAlbumFirstFrameProcessed -= HandleAlbumFirstFrameProcessed;
-            }
-        }
-
-        /// <summary>
-        /// 服务器通知：第一张相册图片已经处理完，可以继续上传后续帧
-        /// </summary>
-        private void HandleAlbumFirstFrameProcessed()
-        {
-            albumFirstProcessedByServer = true;
-
-            if (verboseLog)
-                Debug.Log("[ARFU] Album first frame processed by server → resume capturing.");
         }
 
         void Update()
@@ -93,37 +58,12 @@ namespace ARJourneyIntoMovies.Server
             if (timer < captureInterval) return;
             timer = 0f;
 
-            if (isUploadingNow)
-            {
-                // 上一帧还在上传，先不再开新协程
-                return;
-            }
-
             var info = movieSceneFrameController.GetSelectedFrameInfo();
             string movieName = info.movie;
             string sceneName = info.scene;
             string frameId = info.frame;
             Texture2D frameTexture = info.frameTexture;
             bool fromAlbum = info.fromAlbum;
-
-            isAlbumMode = fromAlbum;
-
-            // ====== 相册模式的节流逻辑 ======
-            if (isAlbumMode)
-            {
-                // 第一张相册图片尚未上传 → 允许上传一次
-                if (!albumFirstUploadSent)
-                {
-                    if (verboseLog) Debug.Log("[ARFU] Album mode: sending FIRST album frame.");
-                }
-                // 第一张相册图已上传，但服务器未确认处理完成 → 不再上传后续帧
-                else if (!albumFirstProcessedByServer)
-                {
-                    if (verboseLog) Debug.Log("[ARFU] Album mode: waiting for server to finish first frame, skip capture.");
-                    return;
-                }
-                // 第一张相册图已上传且服务器处理完成 → 后续帧正常上传（用 AR 相机画面）
-            }
 
             // 到这里说明本帧允许上传
             OnCaptureStarted?.Invoke();
@@ -132,8 +72,8 @@ namespace ARJourneyIntoMovies.Server
                 movieName,
                 sceneName,
                 frameId,
-                frameTexture,
-                isAlbumMode
+                frameTexture
+                // isAlbumMode
             ));
         }
 
@@ -144,25 +84,22 @@ namespace ARJourneyIntoMovies.Server
             string movieName,
             string sceneName,
             string frameId,
-            Texture2D albumTexture,
-            bool isFromAlbum)
+            Texture2D albumTexture)
         {
-            isUploadingNow = true;
-
             // --- 1. ARSession 状态检查 ---
-            if (ARSession.state <= ARSessionState.Ready)
-            {
-                if (verboseLog)
-                    Debug.LogWarning($"[ARFU] ARSession not tracking yet: {ARSession.state}");
-                isUploadingNow = false;
-                yield break;
-            }
+            // if (ARSession.state <= ARSessionState.Ready)
+            // {
+            //     if (verboseLog)
+            //         Debug.LogWarning($"[ARFU] ARSession not tracking yet: {ARSession.state}");
+            //     isUploadingNow = false;
+            //     yield break;
+            // }
 
             // --- 2. 获取 CPU 图像 ---
             if (!cameraManager.TryAcquireLatestCpuImage(out XRCpuImage image))
             {
                 Debug.LogWarning("[ARFU] TryAcquireLatestCpuImage = false (no CPU image available)");
-                isUploadingNow = false;
+                // isUploadingNow = false;
                 yield break;
             }
 
@@ -184,9 +121,9 @@ namespace ARJourneyIntoMovies.Server
             int height = image.height;
             image.Dispose();
 
-            Texture2D camTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
-            camTexture.LoadRawTextureData(buffer);
-            camTexture.Apply();
+            Texture2D texture = new Texture2D(width, height, TextureFormat.RGBA32, false);
+            texture.LoadRawTextureData(buffer);
+            texture.Apply();
             buffer.Dispose();
 
             // --- 3. 相机位姿 ---
@@ -236,56 +173,30 @@ namespace ARJourneyIntoMovies.Server
                 movieName = movieName,
                 sceneName = sceneName,
                 frameId = frameId,
-                isFromAlbum = isFromAlbum
+                isFromAlbum = false
             };
             string json = JsonUtility.ToJson(payload);
+            byte[] imageBytes = texture.EncodeToPNG();
+            Destroy(texture);
 
-            // --- 6. 确定要上传哪一张图 ---
-            byte[] imageBytes;
-            bool useAlbumFirstFrame = (isFromAlbum && !albumFirstUploadSent);
-
-            if (useAlbumFirstFrame)
-            {
-                // 使用“相册中的电影帧 PNG”作为第一帧上传
-                imageBytes = albumTexture.EncodeToPNG();
-                albumFirstUploadSent = true;          // 已经发出第一张相册图
-                albumFirstProcessedByServer = false;  // 等待服务器发事件
-
-                if (verboseLog)
-                    Debug.Log("[ARFU] Uploading FIRST album frame texture.");
-            }
-            else
-            {
-                // 后续帧或普通模式：用 AR 相机截图
-                imageBytes = camTexture.EncodeToPNG();
-            }
-
-            Destroy(camTexture);
-
-            // --- 7. 构建表单并上传 ---
             var form = new WWWForm();
             form.AddBinaryData("image", imageBytes, $"frame_{payload.timestamp_ms}.png", "image/png");
             form.AddField("meta_json", json);
 
             if (verboseLog) Debug.Log("[ARFU] POST " + serverUrl);
             using (UnityWebRequest www = UnityWebRequest.Post(serverUrl, form))
-            {
-                www.SetRequestHeader("Connection", "close");
+            {         
+                www.SetRequestHeader("Connection", "close"); 
 
                 yield return www.SendWebRequest();
 
                 if (www.result != UnityWebRequest.Result.Success)
-                {
                     Debug.LogError("[ARFU] Upload failed: " + www.error + " (code=" + www.responseCode + ")");
-                }
                 else
                 {
-                    if (serverClient != null)
-                        serverClient.ProcessServerResponse(www.downloadHandler.text);
+                    serverClient.ProcessServerResponse(www.downloadHandler.text);
                 }
             }
-
-            isUploadingNow = false;
         }
     }
 }

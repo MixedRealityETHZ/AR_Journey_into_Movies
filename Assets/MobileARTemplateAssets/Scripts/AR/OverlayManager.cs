@@ -21,7 +21,9 @@ namespace ARJourneyIntoMovies.AR
 
         [Tooltip("Slider for alpha control")]
         public Slider alphaSlider;
-        public GameObject spawnedPerson;  
+        public GameObject spawnedPerson_einstein;  
+        public GameObject spawnedPerson_trueman;  
+        private GameObject spawnedPerson;
 
         [Tooltip("Button to return to guidance mode")]
         public Button returnButton;
@@ -115,9 +117,9 @@ namespace ARJourneyIntoMovies.AR
             if (texture == null)
                 return;
 
-            Texture2D readableTex = MakeReadable(texture);
-            Texture2D rotated = RotateTexture90(readableTex);
-            MovieFrameTexture = rotated;
+            // Texture2D readableTex = MakeReadable(texture);
+            // Texture2D rotated = RotateTexture90(readableTex);
+            MovieFrameTexture = texture;
             isPhotoSelected = true;
         }
 
@@ -125,13 +127,14 @@ namespace ARJourneyIntoMovies.AR
         {
             int width = src.width;
             int height = src.height;
+
             Texture2D dst = new Texture2D(height, width, src.format, false);
 
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
                 {
-                    dst.SetPixel(y, width - 1 - x, src.GetPixel(x, y));
+                    dst.SetPixel(height - 1 - y, x, src.GetPixel(x, y));
                 }
             }
 
@@ -188,6 +191,16 @@ namespace ARJourneyIntoMovies.AR
 
             // Set texture
             overlayImage.texture = movieFrame;
+            // --- 保持原始宽高比 ---
+
+            float aspect = (float)movieFrame.width / movieFrame.height;
+            var fitter = overlayImage.GetComponent<AspectRatioFitter>();
+            if (fitter == null)
+                fitter = overlayImage.gameObject.AddComponent<AspectRatioFitter>();
+
+            fitter.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
+            fitter.aspectRatio = aspect;
+
 
             // Set alpha
             SetAlpha(alpha);
@@ -411,10 +424,36 @@ namespace ARJourneyIntoMovies.AR
 
         private void OnLongPressToggle()
         {
+            float right = 0.0f;
+            float up = 0.0f;
+            float forward = 1.0f;
+            var info = movieSceneFrameController.GetSelectedFrameInfo();
+            string movieName = info.movie;
+            string sceneName = info.scene;
+            string frameId = info.frame;
+            if(movieName == "ETHz-CAB" && sceneName == "Outdoor1" && frameId == "frame1")
+            {
+                spawnedPerson = spawnedPerson_einstein;
+                right = 0.31f;
+                up = -2.02f;
+                forward = 11.0f;
+            }
+            else if(movieName == "ETHz-HG" && sceneName == "EO-Nord" && frameId == "frame2")
+            {
+                spawnedPerson = spawnedPerson_trueman;
+                right = -0.31f;
+                up = -1.22f;
+                forward = 10.57f;
+            }
+            else
+            {
+                Debug.LogWarning("[OverlayManager] No person prefab assigned for this frame.");
+                return;
+            }
             if (!isPersonVisible)
             {
                 // 电影帧 → 人物
-                StartCoroutine(TransitionOverlayToPerson());
+                StartCoroutine(TransitionOverlayToPerson(right, up, forward));
             }
             else
             {
@@ -423,7 +462,7 @@ namespace ARJourneyIntoMovies.AR
             }
         }
 
-        private IEnumerator TransitionOverlayToPerson()
+        private IEnumerator TransitionOverlayToPerson(float right, float up, float forward)
         {
             float duration = 0.6f;
             float t = 0;
@@ -432,11 +471,11 @@ namespace ARJourneyIntoMovies.AR
             if (cg == null)
                 cg = overlayImage.gameObject.AddComponent<CanvasGroup>();
 
-            spawnedPerson = SpawnPersonInWorld();
+            SpawnPersonInWorld(right, up, forward);
             Renderer rend = spawnedPerson.GetComponentInChildren<Renderer>();
             Material mat = rend.material;
-            Color mc = mat.color;
-            mc.a = 0f;                   // 从透明开始
+            Color mc = mat.color; 
+            mc.a = 0f;         
             mat.color = mc;
 
             while (t < duration)
@@ -453,6 +492,7 @@ namespace ARJourneyIntoMovies.AR
 
                 yield return null;
             }
+            // spawnedPerson.SetActive(true);
             // overlayImage.gameObject.SetActive(false);
             isPersonVisible = true; 
         }
@@ -494,30 +534,73 @@ namespace ARJourneyIntoMovies.AR
             isPersonVisible = false; 
         }
 
-        private GameObject SpawnPersonInWorld()
+        private void SpawnPersonInWorld(float right, float up, float forward)
         {
             if (spawnedPerson == null)
             {
                 Debug.LogError("personPrefab not assigned!");
-                return null;
+                return;
             }
 
-            // 克隆一个人物
-            GameObject go = Instantiate(spawnedPerson);
+            // 克隆
+            spawnedPerson.transform.localScale = new Vector3(
+                -spawnedPerson.transform.localScale.x,   // 镜像翻转
+                spawnedPerson.transform.localScale.y,
+                spawnedPerson.transform.localScale.z
+            );
+            spawnedPerson.SetActive(true);
 
-            // 启用
-            go.SetActive(true);
-
-            // 放到 1m 前方
+            // 相机
             Transform cam = Camera.main.transform;
-            go.transform.position = cam.position + cam.forward * 1.0f;
 
-            // 只让 Y 轴旋转面向用户（避免倾斜）
+            Vector3 newPos =
+                cam.position +
+                cam.right * right +
+                cam.up * up +
+                cam.forward * forward;
+            spawnedPerson.transform.position = newPos;  
+
+            // 让人物保持正面朝向相机（只旋转 Y 轴）
             Vector3 look = cam.position;
-            look.y = go.transform.position.y;
-            go.transform.LookAt(look);
+            look.y = spawnedPerson.transform.position.y;
+            spawnedPerson.transform.LookAt(look);
 
-            return go;
+            Debug.Log("[OverlayManager] Person spawned at local offset (1.47, 0.15, 0.52).");
+        }
+
+        // ================================
+        // Control spawned person position
+        // ================================
+        public void UpdatePersonPosition(float offsetX, float offsetY, float offsetZ)
+        {
+            if (spawnedPerson == null)
+            {
+                Debug.LogWarning("[OverlayManager] No spawned person to move.");
+                return;
+            }
+
+            Transform cam = Camera.main.transform;
+
+            // Base forward position (1m ahead)
+            Vector3 basePos = cam.position + cam.forward * 1.0f;
+
+            // Apply offsets (local camera space)
+            Vector3 right = cam.right;
+            Vector3 up = cam.up;
+            Vector3 forward = cam.forward;
+
+            Vector3 newPos =
+                basePos +
+                right * offsetX +
+                up * offsetY +
+                forward * offsetZ;
+
+            spawnedPerson.transform.position = newPos;
+
+            // Keep person facing camera (Y axis only)
+            Vector3 look = cam.position;
+            look.y = spawnedPerson.transform.position.y;
+            spawnedPerson.transform.LookAt(look);
         }
     }
 }

@@ -10,6 +10,7 @@ public class IPPanelController : MonoBehaviour
     public TMP_InputField inputFieldIP;
     public Button confirmButton;
     public Button cancelButton;
+    public LocalizationProgressUI localizationProgressUI;
 
     [Header("Targets to Update")]
     public ARFrameUploader frameUploader;
@@ -28,13 +29,19 @@ public class IPPanelController : MonoBehaviour
     
     public void OpenIPPanel()
     {
-        var info = frameSelect.GetSelectedFrameInfo();
-        Texture2D frameTexture = info.frameTexture;
-        if (frameSelect != null && frameTexture == null)
-        {
-            Debug.LogWarning("No movie frame selected yet.");
-            return;
-        }
+        // var info = frameSelect.GetSelectedFrameInfo();
+        // Texture2D frameTexture = info.frameTexture;
+        // if (frameSelect != null && frameTexture == null)
+        // {
+        //     Debug.LogWarning("No movie frame selected yet.");
+        //     return;
+        // }
+
+        // if(localizationProgressUI.progressPanel.activeSelf)
+        // {
+        //     return;
+        // }
+
         IPPanel.SetActive(true);
         inputFieldIP.text = remembered_ip;
     }

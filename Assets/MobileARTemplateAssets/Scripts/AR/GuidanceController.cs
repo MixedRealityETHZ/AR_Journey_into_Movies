@@ -371,7 +371,6 @@ namespace ARJourneyIntoMovies.AR
             // Call OverlayManager to show overlay
             if (overlayManager != null)
             {
-                // overlayManager.ShowOverlayWithPlaceholder();
                 overlayManager.ShowOverlayWithPlaceholder();
             }
             else

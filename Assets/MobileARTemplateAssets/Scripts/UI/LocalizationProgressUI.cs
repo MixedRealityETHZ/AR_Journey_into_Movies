@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using ARJourneyIntoMovies.Server;
+using UnityEngine.UI;
 
 public class LocalizationProgressUI : MonoBehaviour
 {
@@ -13,6 +14,7 @@ public class LocalizationProgressUI : MonoBehaviour
     [Header("UI")]
     public GameObject progressPanel;
     public TMP_Text progressText;
+    public Button ButtonStop;
 
     private void Start()
     {
@@ -23,6 +25,8 @@ public class LocalizationProgressUI : MonoBehaviour
             // 👇 拍照按钮触发 → 显示 panel
             uploader.OnCaptureStarted += ShowProgressPanel;
         }
+
+        ButtonStop.onClick.AddListener(OnClickClosePanel);
     }
 
     private void OnEnable()
@@ -80,5 +84,11 @@ public class LocalizationProgressUI : MonoBehaviour
     private void HidePanel()
     {
         progressPanel.SetActive(false);
+    }
+
+    private void OnClickClosePanel()
+    {
+        HidePanel();
+        uploader.enabled = false; // 停止上传
     }
 }

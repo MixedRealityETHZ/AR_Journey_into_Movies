@@ -1,6 +1,7 @@
 ETHz-CAB/Outdoor1
 ETHz-HG/Classroom
 ETHz-HG/Outdoor2
+ETHz-HG/EO-Nord
 Interception/Cafe Explosion
 Interception/France Reborn
 The Godfather/Louis Resturant

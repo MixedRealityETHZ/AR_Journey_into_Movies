@@ -99,13 +99,13 @@ public class MovieSceneFrameController : MonoBehaviour
         ShowMoviePanel();
 
         backFromSceneButton.onClick.AddListener(GoToMoviePanel);
-        backFromFrameButton.onClick.AddListener(GoToFrameSelectionPanel);
+        backFromFrameButton.onClick.AddListener(GoToScenePanel);
         confirmFrameButton.onClick.AddListener(OnConfirmFrameSelected);
         nextFromMovieButton.onClick.AddListener(GoToScenePanel);
-        nextFromSceneButton.onClick.AddListener(GoToFrameSelectionPanel);
+        nextFromSceneButton.onClick.AddListener(GoToFramePanel);
         ButtonAlbum.onClick.AddListener(GoToMoviePanel);
-        ChooseBuiltinImageButton.onClick.AddListener(GoToFramePanel);
-        ChooseAlbumImageButton.onClick.AddListener(OnOpenChooseAlbumPanel);
+        // ChooseBuiltinImageButton.onClick.AddListener(GoToFramePanel);
+        // ChooseAlbumImageButton.onClick.AddListener(OnOpenChooseAlbumPanel);
     }
 
     void GetFrameInfo()
@@ -329,47 +329,47 @@ public class MovieSceneFrameController : MonoBehaviour
         PopulateFrames(currentScene);
     }
 
-    void GoToFrameSelectionPanel()
-    {
-        ChooseFramePanel.SetActive(true);
-        framePanel.SetActive(false);
-        moviePanel.SetActive(false);
-        scenePanel.SetActive(false);
-    }
+    // void GoToFrameSelectionPanel()
+    // {
+    //     ChooseFramePanel.SetActive(true);
+    //     framePanel.SetActive(false);
+    //     moviePanel.SetActive(false);
+    //     scenePanel.SetActive(false);
+    // }
 
-    private void OnOpenChooseAlbumPanel()
-    {
-        ChooseFramePanel.SetActive(false);
-        PickImageFromGallery();
-    }
+    // private void OnOpenChooseAlbumPanel()
+    // {
+    //     ChooseFramePanel.SetActive(false);
+    //     PickImageFromGallery();
+    // }
 
-    private void PickImageFromGallery()
-    {
-        // 调用 NativeGallery
-        NativeGallery.GetImageFromGallery((path) =>
-        {
-            if (path == null)
-            {
-                Debug.Log("User cancelled picking image");
-                return;
-            }
+    // private void PickImageFromGallery()
+    // {
+    //     // 调用 NativeGallery
+    //     NativeGallery.GetImageFromGallery((path) =>
+    //     {
+    //         if (path == null)
+    //         {
+    //             Debug.Log("User cancelled picking image");
+    //             return;
+    //         }
 
-            // 加载图片为 Texture2D
-            Texture2D texture = NativeGallery.LoadImageAtPath(path, 2048);
-            if (texture == null)
-            {
-                Debug.LogError("Failed to load texture");
-                return;
-            }
-            MovieFrameTexture = texture;
-            movieName = currentMovie.name;
-            sceneName = currentScene.name;
-            frameId = "FromAlbum";
-            isFromAlbum = true;
+    //         // 加载图片为 Texture2D
+    //         Texture2D texture = NativeGallery.LoadImageAtPath(path, 2048);
+    //         if (texture == null)
+    //         {
+    //             Debug.LogError("Failed to load texture");
+    //             return;
+    //         }
+    //         MovieFrameTexture = texture;
+    //         movieName = currentMovie.name;
+    //         sceneName = currentScene.name;
+    //         frameId = "FromAlbum";
+    //         isFromAlbum = true;
 
-            overlayManager.setMovieFrame();
-        }, "Select a photo");
-    }
+    //         overlayManager.setMovieFrame();
+    //     }, "Select a photo");
+    // }
 }
 
 

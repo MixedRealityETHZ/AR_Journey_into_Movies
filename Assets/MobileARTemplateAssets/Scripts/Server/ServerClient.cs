@@ -32,8 +32,6 @@ namespace ARJourneyIntoMovies.Server
         // Events (cannot use [Header] attribute on events)
         public event Action<PoseData> OnPoseReceived;
         public event Action<string> OnError;
-        public event Action OnAlbumFirstFrameProcessed;
-        private bool albumFirstProcessed = false;
 
         private void Awake()
         {
@@ -57,11 +55,6 @@ namespace ARJourneyIntoMovies.Server
             if (!raw.success)
             {
                 OnError?.Invoke(raw.reason);
-                if (!albumFirstProcessed)
-                {
-                    albumFirstProcessed = true;
-                    OnAlbumFirstFrameProcessed?.Invoke();
-                }
                 return;
             }
 
