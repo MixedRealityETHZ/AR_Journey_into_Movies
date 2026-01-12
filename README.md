@@ -9,15 +9,12 @@ By integrating server-side Structure-from-Motion (SfM) models with real-time mob
 original movie frames directly onto the live camera view. This allows users not only to stand at the original filming position, but also to capture photos and videos with
 precise cinematic alignment.
 
-The project focuses on robust camera localization, efficient server-side processing,
-and intuitive AR guidance, demonstrating how computer vision and mobile AR can be
-combined to bridge film history and physical experience.
+The project focuses on robust camera localization, efficient server-side processing, and intuitive AR guidance, demonstrating how computer vision and mobile AR can be combined to bridge film history and physical experience.
 
-You can find the project **paper** here: [link]  
-You can find the project **demo video** here: [link]
+You can find the project **paper** here: [[link](https://github.com/fannyrika/MRv2/blob/58b514c78f240ef186558b947fa32b06bcf59626/MR_report.pdf)]  
+You can find the project **demo video** here: [[link](https://drive.google.com/file/d/1Oq_z8GhvoA68HsbQnFUXR84OpYLmLJHK/view?pli=1)]
 
-This project was developed as part of the **Mixed Reality** (Fall Semester 2025)
-course at ETH Zurich.
+This project was developed as part of the **Mixed Reality** (Fall Semester 2025) course at ETH Zurich.
 
 ---
 
@@ -43,7 +40,7 @@ summarized below.
 - Performs image retrieval and camera localization using a modified **HLoc pipeline**
 - Estimates camera poses in the SfM coordinate frame
 - Computes a **similarity transformation (sRt)** to align the SfM world with the mobile AR session
-- Returns refined poses to the mobile client for accurate AR alignment
+- Returns refined movie frames AR session poses to the mobile client for accurate AR alignment
 
 ---
 
@@ -55,7 +52,7 @@ summarized below.
 4. The server localizes selected frames in the SfM model.
 5. A similarity transformation aligns the SfM coordinate system with the AR session.
 6. The original movie frame is overlaid onto the live camera view.
-7. The user captures photos with cinematic alignment of optional functions (filters, movie characters).
+7. The user captures photos with optional functions (filters, movie characters).
 
 ![Core Flow](core_flow.png)
 
@@ -66,11 +63,12 @@ summarized below.
 AR-Journey-to-Movie/
 ├── unity-client/ # Unity mobile AR application
 │ ├── Assets/
-│ ├── Scenes/
-│ └── Scripts/
+│ ├── Packages/
+│ └── ProjectSettings/
 │
 ├── server/ # Python backend
 │ ├── sfm_models/
+| ├── HLoc/
 │ ├── query_sfm_pose.py/
 │ ├── utils.py/
 │ └── server_main.py
