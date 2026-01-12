@@ -3,6 +3,10 @@ using TMPro;
 using ARJourneyIntoMovies.Server;
 using UnityEngine.UI;
 
+/// <summary>
+/// UI controller that displays localization progress and results
+/// during server-side image-based localization.
+/// </summary>
 public class LocalizationProgressUI : MonoBehaviour
 {
     [Header("Server")]
@@ -22,7 +26,7 @@ public class LocalizationProgressUI : MonoBehaviour
 
         if (uploader != null)
         {
-            // 👇 拍照按钮触发 → 显示 panel
+            // Triggered when capture starts → show progress panel
             uploader.OnCaptureStarted += ShowProgressPanel;
         }
 
@@ -52,32 +56,26 @@ public class LocalizationProgressUI : MonoBehaviour
         }
     }
 
-    // ===================================================
-    // 📸 用户点击“拍照”后
-    // ===================================================
+    // After user triggers capture
     private void ShowProgressPanel()
     {
         progressPanel.SetActive(true);
         progressText.text = "Processing...";
     }
 
-    // ===================================================
-    // ❌ success = false
-    // ===================================================
+    // Server response: failure
     private void HandleServerError(string msg)
     {
         progressPanel.SetActive(true);
         progressText.text = msg;    // reason
     }
 
-    // ===================================================
-    // ✅ success = true
-    // ===================================================
+    // Server response: success
     private void HandleServerSuccess(PoseData pose)
     {
         progressText.text = "Localization Success";
 
-        // 0.5s 后关闭
+        // Close panel after a short delay
         Invoke(nameof(HidePanel), 1.0f);
     }
 
@@ -89,6 +87,6 @@ public class LocalizationProgressUI : MonoBehaviour
     private void OnClickClosePanel()
     {
         HidePanel();
-        uploader.enabled = false; // 停止上传
+        uploader.enabled = false; // Stop further uploads
     }
 }

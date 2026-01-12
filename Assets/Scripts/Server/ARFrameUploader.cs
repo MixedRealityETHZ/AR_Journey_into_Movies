@@ -22,7 +22,7 @@ namespace ARJourneyIntoMovies.Server
         public Intrinsics intrinsics;
         public Notes notes;
 
-        // 电影信息
+        // Selected movie/scene/frame metadata (for server-side routing)
         public string movieName;
         public string sceneName;
         public string frameId;
@@ -65,7 +65,7 @@ namespace ARJourneyIntoMovies.Server
             Texture2D frameTexture = info.frameTexture;
             bool fromAlbum = info.fromAlbum;
 
-            // 到这里说明本帧允许上传
+            // At this point, a valid frame is selected and capture/upload is allowed
             OnCaptureStarted?.Invoke();
 
             StartCoroutine(CaptureAndUpload(
@@ -78,7 +78,7 @@ namespace ARJourneyIntoMovies.Server
         }
 
         // =====================================================
-        //              Capture + Upload 主流程
+        //              Capture + Upload main flow
         // =====================================================
         private IEnumerator CaptureAndUpload(
             string movieName,
@@ -86,7 +86,7 @@ namespace ARJourneyIntoMovies.Server
             string frameId,
             Texture2D albumTexture)
         {
-            // --- 1. ARSession 状态检查 ---
+            // --- 1) (Optional) ARSession tracking state check ---
             // if (ARSession.state <= ARSessionState.Ready)
             // {
             //     if (verboseLog)
@@ -95,7 +95,7 @@ namespace ARJourneyIntoMovies.Server
             //     yield break;
             // }
 
-            // --- 2. 获取 CPU 图像 ---
+            // --- 2) Acquire latest CPU camera image (for upload) ---
             if (!cameraManager.TryAcquireLatestCpuImage(out XRCpuImage image))
             {
                 Debug.LogWarning("[ARFU] TryAcquireLatestCpuImage = false (no CPU image available)");
@@ -111,6 +111,7 @@ namespace ARJourneyIntoMovies.Server
                 inputRect = new RectInt(0, 0, image.width, image.height),
                 outputDimensions = new Vector2Int(image.width, image.height),
                 outputFormat = TextureFormat.RGBA32,
+                // Mirror Y so the CPU image matches screen-space orientation
                 transformation = XRCpuImage.Transformation.MirrorY
             };
 
@@ -126,7 +127,7 @@ namespace ARJourneyIntoMovies.Server
             texture.Apply();
             buffer.Dispose();
 
-            // --- 3. 相机位姿 ---
+            // --- 3) Camera pose (Unity world) ---
             var cam = cameraManager.GetComponent<Camera>().transform;
             Quaternion qUnity = cam.rotation;
             Vector3 tUnity = cam.position;
@@ -137,7 +138,7 @@ namespace ARJourneyIntoMovies.Server
             float[] rot_xyzw = { qUnity.x, qUnity.y, qUnity.z, qUnity.w };
             float[] pos_m = { tUnity.x, tUnity.y, tUnity.z };
 
-            // --- 4. 相机内参 ---
+            // --- 4) Camera intrinsics (fx, fy, cx, cy) ---
             float fx = 0, fy = 0, cx = 0, cy = 0;
             int intrW = width, intrH = height;
             if (cameraManager.TryGetIntrinsics(out XRCameraIntrinsics intr))
@@ -158,9 +159,10 @@ namespace ARJourneyIntoMovies.Server
                 cx *= sx; cy *= sy;
             }
 
+            // Adjust principal point for the applied MirrorY conversion
             float cy_flipped = (height - 1) - cy;
 
-            // --- 5. 构建 Payload JSON ---
+            // --- 5) Build metadata JSON + encode image ---
             long ts_ms = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             var payload = new Payload
             {

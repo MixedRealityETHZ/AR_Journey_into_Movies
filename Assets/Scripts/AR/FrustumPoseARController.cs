@@ -9,12 +9,18 @@ using ARJourneyIntoMovies.Server;
 
 namespace ARJourneyIntoMovies.AR
 {
+    /// <summary>
+    /// Controls a camera frustum pose in AR.
+    /// Supports automatic camera-following mode and manual pose input,
+    /// and publishes pose updates to the server layer.
+    /// </summary>
     public class FrustumPoseARController : MonoBehaviour
     {
         [Header("Target Object")]
-        public Transform frustumTarget;  // 👈 要控制的四棱锥对象
+        public Transform frustumTarget;  
         [Header("AR Settings")]
         public ARCameraManager cameraManager;
+        // Optional conversion from Unity camera convention to OpenCV-style camera
         public bool convertToOpenCVCamera = false;
         public bool verboseLog = false;
         public float updateInterval = 0.05f;
@@ -27,8 +33,9 @@ namespace ARJourneyIntoMovies.AR
         public TMP_Text modeLabel;
 
         [Header("Events")]
-        public Action<PoseData> OnPoseUpdated; // 发送给 ServerClient
+        public Action<PoseData> OnPoseUpdated; 
 
+        // True = follow AR camera rotation automatically; false = manual control
         private bool followCameraRotation = true;
         private float timer = 0f;
         private Quaternion currentRotation = Quaternion.identity;
@@ -51,6 +58,7 @@ namespace ARJourneyIntoMovies.AR
 
         void Update()
         {
+            // Throttle pose updates to avoid excessive updates
             timer += Time.deltaTime;
             if (timer >= updateInterval)
             {
@@ -61,7 +69,7 @@ namespace ARJourneyIntoMovies.AR
             }
         }
 
-        // 📱 从相机更新旋转并实时推送 pose
+        // Update rotation from the AR camera and publish pose in AUTO mode
         void UpdateRotationFromCamera()
         {
             if (ARSession.state <= ARSessionState.Ready) return;
@@ -79,7 +87,7 @@ namespace ARJourneyIntoMovies.AR
 
             UpdateInputFields();
 
-            // 推送新的姿态（顶点在相机原点）
+            // Publish current pose (frustum apex at camera origin)
             PoseData pose = new PoseData
             {
                 success = true,
@@ -97,7 +105,7 @@ namespace ARJourneyIntoMovies.AR
                 Debug.Log($"[FrustumPoseARController] Auto rotation sent: {currentRotation.eulerAngles}");
         }
 
-        // 🔘 切换模式
+        // Toggle between AUTO (camera-following) and MANUAL (user input) modes
         void ToggleFollowMode()
         {
             followCameraRotation = !followCameraRotation;
@@ -105,7 +113,7 @@ namespace ARJourneyIntoMovies.AR
 
             if (followCameraRotation)
             {
-                // ✅ 切回自动模式时，只更新旋转，不动位置
+                // When switching back to AUTO, update rotation only and keep translation
                 Camera cam = cameraManager.GetComponent<Camera>();
                 if (cam != null)
                 {
@@ -131,7 +139,7 @@ namespace ARJourneyIntoMovies.AR
                 modeLabel.text = followCameraRotation ? "Mode: AUTO (Following Camera)" : "Mode: MANUAL (User Input)";
         }
 
-        // 🧮 手动输入并应用
+        // Read manual quaternion/translation input and apply pose
         public void ReadInputsAndApplyPose()
         {
             if (followCameraRotation)
@@ -158,7 +166,7 @@ namespace ARJourneyIntoMovies.AR
                     frustumTarget.SetPositionAndRotation(currentTranslation, currentRotation);
                 UpdateInputFields();
 
-                // 推送手动姿态
+                // Publish manually applied pose
                 PoseData pose = new PoseData
                 {
                     success = true,
@@ -180,7 +188,7 @@ namespace ARJourneyIntoMovies.AR
             }
         }
 
-        // 🧾 输入框更新
+        // Update UI input fields from current pose state
         void UpdateInputFields()
         {
             inputQx?.SetTextWithoutNotify(currentRotation.x.ToString("F3"));

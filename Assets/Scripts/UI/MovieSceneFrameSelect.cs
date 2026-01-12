@@ -6,12 +6,13 @@ using System.IO;
 using ARJourneyIntoMovies.AR;
 using ARJourneyIntoMovies.Server;
 
-
+/// <summary>
+/// UI flow controller for selecting a Movie → Scene → Frame from Resources,
+/// caching the selected identifiers/texture, and notifying the OverlayManager.
+/// </summary>
 public class MovieSceneFrameController : MonoBehaviour
 {
-    // =========================================================
-    //  ���ݽṹ
-    // =========================================================
+    //  Data structures
     [System.Serializable]
     public class MovieData
     {
@@ -34,14 +35,12 @@ public class MovieSceneFrameController : MonoBehaviour
         public string id;
         public Sprite framesprite;
     }
+    //  Inspector references
     [Header("Navigation Buttons")]
     public Button backFromSceneButton;
     public Button backFromFrameButton;
     public Button confirmFrameButton;
 
-    // =========================================================
-    //  Inspector ��ק��
-    // =========================================================
     [Header("Panels")]
     public GameObject moviePanel;
     public GameObject scenePanel;
@@ -67,9 +66,7 @@ public class MovieSceneFrameController : MonoBehaviour
     public Button ChooseBuiltinImageButton;
     public Button ChooseAlbumImageButton;
 
-    // =========================================================
-    // �ڲ�����
-    // =========================================================
+    //  Internal state
     private List<MovieData> movies = new List<MovieData>();
     private MovieData currentMovie;
     private SceneData currentScene;
@@ -84,15 +81,14 @@ public class MovieSceneFrameController : MonoBehaviour
     private Texture2D MovieFrameTexture;
     private bool isFromAlbum = false;
 
+    // Read-only access for other systems (uploader/map/overlay) to consume the current selection
     public (string movie, string scene, string frame, Texture2D frameTexture, bool fromAlbum) GetSelectedFrameInfo()
     {
         return (movieName, sceneName, frameId, MovieFrameTexture, isFromAlbum);
     }
 
 
-    // =========================================================
-    //  �����߼�
-    // =========================================================
+    //  Unity lifecycle
     void Start()
     {
         LoadAllMoviesFromResources();
@@ -113,9 +109,7 @@ public class MovieSceneFrameController : MonoBehaviour
         
     }
 
-    // =========================================================
-    //  �Զ����� Resources/Movies �µ�����ͼƬ
-    // =========================================================
+    //  Load movies/scenes/frames from Resources/Movies
     void LoadAllMoviesFromResources()
     {
         movies.Clear();
@@ -130,7 +124,7 @@ public class MovieSceneFrameController : MonoBehaviour
             string line = rawLine.Trim();
             string[] parts = line.Split('/');
             
-            string movieName = parts[0].Trim();   // '/' 前
+            string movieName = parts[0].Trim();   // Segment before '/'
 
             if(!movieNames.Contains(movieName))
             {
@@ -175,9 +169,7 @@ public class MovieSceneFrameController : MonoBehaviour
         }
     }
 
-    // =========================================================
-    // UI �л���Movie �� Scene �� Frame �� AR
-    // =========================================================
+    // UI navigation: Movie → Scene → Frame
     public void ShowMoviePanel()
     {
         moviePanel.SetActive(false);
@@ -277,9 +269,7 @@ public class MovieSceneFrameController : MonoBehaviour
     }
 
 
-    // =========================================================
-    // ���ߺ���
-    // =========================================================
+    // Helper methods
     void ClearContent(Transform content)
     {
         foreach (Transform c in content)
@@ -371,5 +361,3 @@ public class MovieSceneFrameController : MonoBehaviour
     //     }, "Select a photo");
     // }
 }
-
-

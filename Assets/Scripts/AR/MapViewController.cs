@@ -2,6 +2,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
+/// <summary>
+/// Slides a map panel and HUD panel to toggle between
+/// an embedded Google Maps route view and an in-app arrow guidance mode.
+/// </summary>
 public class MapViewController : MonoBehaviour
 {
     [Header("UI Elements")]
@@ -25,23 +29,23 @@ public class MapViewController : MonoBehaviour
     private Vector2 hudShownPos;
     private Vector2 hudHiddenPos;
 
-    // 状态枚举：地图模式 <-> 箭头模式
+    // UI mode: Map view ↔ Arrow guidance
     private enum Mode { Map, Arrow }
     private Mode currentMode = Mode.Map;
 
-    // 目标：46°N, 8°E
+    // Destination coordinates (set per selected scene)
     private double targetLat = 47.378352;
     private double targetLon = 8.548224;
     private bool webViewLoaded = false;
 
     void Start()
     {
-        // 记录 mapPanel 初始位置（滑下来的位置）
+        // Cache shown/hidden positions (map starts hidden above the screen)
         mapShownPos = mapPanel.anchoredPosition;
         mapHiddenPos = mapShownPos + new Vector2(0, mapPanel.rect.height);
         mapPanel.anchoredPosition = mapHiddenPos;
 
-        // HUD：初始显示
+        // Cache HUD positions (HUD starts hidden above the screen)
         hudShownPos = hudPanel.anchoredPosition;
         hudHiddenPos = hudShownPos + new Vector2(0, hudPanel.rect.height);
         hudPanel.anchoredPosition = hudHiddenPos;
@@ -49,18 +53,17 @@ public class MapViewController : MonoBehaviour
         mapButton.onClick.AddListener(OnModeToggle);
         ButtonIcon.sprite = iconMap; 
 
-        // 创建 WebView
+        // Create and initialize WebView (hidden by default)
         webView = gameObject.AddComponent<WebViewObject>();
         webView.Init(enableWKWebView: true);
         webView.SetVisibility(false);
         UpdateWebViewRect();
     }
 
-    // ========================
     //  Toggle: Map ↔ Arrow
-    // ========================
     void OnModeToggle()
     {
+        // Require a selected frame before showing navigation
         var info = frameSelect.GetSelectedFrameInfo();
         Texture2D frameTexture = info.frameTexture;
         if (frameSelect != null && frameTexture == null)
@@ -79,9 +82,7 @@ public class MapViewController : MonoBehaviour
         }
     }
 
-    // ========================
-    //   Google Map
-    // ========================
+    //   Google Maps route view
     void SwitchToMapMode()
     {
         if (!webViewLoaded)
@@ -91,29 +92,27 @@ public class MapViewController : MonoBehaviour
 
         currentMode = Mode.Arrow;
 
-        // 切换按钮图标
+        // Swap button icon
         ButtonIcon.sprite = iconArrow;
 
-        // 滑下地图，滑上 HUD
+        // Slide map in and HUD out
         StartCoroutine(SlideRect(mapPanel, mapPanel.anchoredPosition, mapShownPos));
         StartCoroutine(SlideRect(hudPanel, hudPanel.anchoredPosition, hudHiddenPos));        
     }
 
-    // ========================
-    //   Arrow Guidance
-    // ========================
+    //   Arrow guidance mode
     void SwitchToArrowMode()
     {
         currentMode = Mode.Map;
 
-        // 切回地图 icon
+        // Switch back to map icon
         ButtonIcon.sprite = iconMap;
 
-        // 隐藏地图，上滑，HUD 下滑
+        // Slide map out and HUD in
         StartCoroutine(SlideRect(mapPanel, mapPanel.anchoredPosition, mapHiddenPos));
         StartCoroutine(SlideRect(hudPanel, hudPanel.anchoredPosition, hudShownPos));
 
-        // 隐藏 WebView
+        // Hide WebView
         webView.SetVisibility(false);
     }
 
@@ -126,6 +125,7 @@ public class MapViewController : MonoBehaviour
             float v = slideCurve.Evaluate(t);
             rt.anchoredPosition = Vector2.Lerp(start, end, v);
 
+            // Keep WebView aligned with the moving map panel
             if (rt == mapPanel)
                 UpdateWebViewRect();
 
@@ -139,6 +139,7 @@ public class MapViewController : MonoBehaviour
         if (webView == null) return;
 
         Rect r = GetPixelRect(mapPanel);
+        // Convert RectTransform world corners to screen-space margins
         webView.SetMargins(
             (int)r.xMin,
             Screen.height - (int)r.yMax,
@@ -161,6 +162,7 @@ public class MapViewController : MonoBehaviour
         if (!Input.location.isEnabledByUser)
             yield break;
 
+        // Use device GPS as the origin for directions
         Input.location.Start();
         int wait = 20;
 
@@ -176,6 +178,7 @@ public class MapViewController : MonoBehaviour
         var info = frameSelect.GetSelectedFrameInfo();
         string movie = info.movie;
 
+        // Choose destination based on selected scene/movie identifier
         if(movie =="ETHz-CAB")
         {
             targetLat = 47.378352;
@@ -189,6 +192,7 @@ public class MapViewController : MonoBehaviour
         double userLat = Input.location.lastData.latitude;
         double userLon = Input.location.lastData.longitude;
 
+        // Build a Google Maps directions URL (walking mode)
         string url =
             $"https://www.google.com/maps/dir/?api=1" +
             $"&origin={userLat},{userLon}" +

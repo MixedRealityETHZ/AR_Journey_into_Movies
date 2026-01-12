@@ -3,8 +3,8 @@ using UnityEngine;
 namespace ARJourneyIntoMovies.AR
 {
     /// <summary>
-    /// Builds frustum mesh for visualizing target camera pose
-    /// Generates wireframe or solid frustum based on FOV and aspect ratio
+    /// Builds frustum mesh for visualization target camera pose.
+    /// Generates wireframe or solid frustum based on FOV and aspect ratio.
     /// </summary>
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
     public class FrustumBuilder : MonoBehaviour
@@ -30,13 +30,7 @@ namespace ARJourneyIntoMovies.AR
             Debug.Log("[FrustumBuilder] Initialized");
         }
 
-        /// <summary>
-        /// Build frustum mesh based on camera FOV and aspect ratio
-        /// Creates a pyramid shape representing the camera's view volume
-        /// </summary>
-        /// <param name="fovDegrees">Vertical field of view in degrees</param>
-        /// <param name="aspect">Aspect ratio (width/height)</param>
-        /// <param name="length">Length of frustum</param>
+        // Build frustum mesh from FOV and aspect ratio
         public Mesh BuildFrustumMesh(float fovDegrees, float aspect, float length)
         {
             Debug.Log($"[FrustumBuilder] Building frustum - FOV: {fovDegrees}°, Aspect: {aspect:F2}, Length: {length}m");
@@ -44,11 +38,11 @@ namespace ARJourneyIntoMovies.AR
             Mesh mesh = new Mesh();
             mesh.name = "FrustumMesh";
 
-            // Calculate half-height and half-width at far plane
+            // Far plane size
             float halfHeight = length * Mathf.Tan(fovDegrees * 0.5f * Mathf.Deg2Rad);
             float halfWidth = halfHeight * aspect;
 
-            // Define vertices
+            // Vertices
             // 0: Camera origin (apex)
             // 1-4: Far plane corners (top-left, top-right, bottom-right, bottom-left)
             Vector3[] vertices = new Vector3[5];
@@ -60,27 +54,22 @@ namespace ARJourneyIntoMovies.AR
 
             if (wireframe)
             {
-                // Wireframe mode: create thin lines
+                // Wireframe
                 BuildWireframeMesh(mesh, vertices);
             }
             else
             {
-                // Solid mode: create pyramid faces
+                // Solid
                 BuildSolidMesh(mesh, vertices);
             }
 
             return mesh;
         }
 
-        /// <summary>
-        /// Build wireframe frustum (12 edges as thin quads)
-        /// </summary>
+        // Build wireframe frustum
         private void BuildWireframeMesh(Mesh mesh, Vector3[] frustumVertices)
         {
-            // Wireframe consists of:
-            // - 4 edges from apex to far plane corners (pyramid edges)
-            // - 4 edges around far plane (rectangle)
-            // Total: 8 edges
+            // 4 edges from apex to far plane, 4 around far plane (8 edges)
 
             int edgeCount = 8;
             Vector3[] vertices = new Vector3[edgeCount * 4]; // Each edge = 4 vertices (quad)
@@ -89,7 +78,7 @@ namespace ARJourneyIntoMovies.AR
             int vIdx = 0;
             int tIdx = 0;
 
-            // Helper function to add edge as quad
+            // Add edge quad
             void AddEdge(Vector3 start, Vector3 end)
             {
                 Vector3 direction = (end - start).normalized;
@@ -117,13 +106,13 @@ namespace ARJourneyIntoMovies.AR
                 tIdx += 6;
             }
 
-            // Pyramid edges (apex to far corners)
+            // Side edges
             AddEdge(frustumVertices[0], frustumVertices[1]); // Apex to top-left
             AddEdge(frustumVertices[0], frustumVertices[2]); // Apex to top-right
             AddEdge(frustumVertices[0], frustumVertices[3]); // Apex to bottom-right
             AddEdge(frustumVertices[0], frustumVertices[4]); // Apex to bottom-left
 
-            // Far plane rectangle edges
+            // Far plane edges
             AddEdge(frustumVertices[1], frustumVertices[2]); // Top edge
             AddEdge(frustumVertices[2], frustumVertices[3]); // Right edge
             AddEdge(frustumVertices[3], frustumVertices[4]); // Bottom edge
@@ -135,23 +124,21 @@ namespace ARJourneyIntoMovies.AR
             mesh.RecalculateBounds();
         }
 
-        /// <summary>
-        /// Build solid frustum (pyramid with 5 faces)
-        /// </summary>
+
+        // Build solid frustum
         private void BuildSolidMesh(Mesh mesh, Vector3[] frustumVertices)
         {
-            // 5 faces: 4 triangle sides + 1 quad far plane
+            // 4 triangle sides + 1 quad far plane
             Vector3[] vertices = new Vector3[5]; // Duplicate vertices for proper normals
             int[] triangles = new int[18]; // 4 triangles (sides) + 2 triangles (far plane)
 
-            // Copy vertices (duplicated for each face to have correct normals)
+            // Copy vertices
             for (int i = 0; i < 5; i++)
             {
                 vertices[i] = frustumVertices[i];
             }
 
             // Triangle indices for 4 side faces
-            // Face 1: Apex - Top-left - Top-right
             triangles[0] = 0; triangles[1] = 2; triangles[2] = 1;
             triangles[3] = 0; triangles[4] = 3; triangles[5] = 2;
             triangles[6] = 0; triangles[7] = 4; triangles[8] = 3;
@@ -165,27 +152,21 @@ namespace ARJourneyIntoMovies.AR
             mesh.RecalculateBounds();
         }
 
-        /// <summary>
-        /// Update frustum visualization with new parameters
-        /// </summary>
+        // Update frustum visualization with new parameters
         public void UpdateFrustum(float fov, float aspect)
         {
             Mesh newMesh = BuildFrustumMesh(fov, aspect, frustumLength);
             meshFilter.mesh = newMesh;
         }
 
-        /// <summary>
-        /// Show/hide frustum
-        /// </summary>
+        // Show/hide frustum
         public void SetVisible(bool visible)
         {
             meshRenderer.enabled = visible;
             Debug.Log($"[FrustumBuilder] Frustum visibility: {visible}");
         }
 
-        /// <summary>
-        /// Set material color (for runtime adjustments)
-        /// </summary>
+        // Set material color (for runtime adjustments)
         public void SetColor(Color color)
         {
             if (meshRenderer != null && meshRenderer.material != null)
@@ -194,9 +175,7 @@ namespace ARJourneyIntoMovies.AR
             }
         }
 
-        /// <summary>
-        /// Set material (for runtime material swaps)
-        /// </summary>
+        // Set material (for runtime material swaps)
         public void SetMaterial(Material material)
         {
             if (meshRenderer != null)

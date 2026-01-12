@@ -191,7 +191,7 @@ namespace ARJourneyIntoMovies.AR
 
             // Set texture
             overlayImage.texture = movieFrame;
-            // --- 保持原始宽高比 ---
+            // Keep the original frame aspect ratio in the full-screen RawImage
 
             float aspect = (float)movieFrame.width / movieFrame.height;
             var fitter = overlayImage.GetComponent<AspectRatioFitter>();
@@ -450,14 +450,15 @@ namespace ARJourneyIntoMovies.AR
                 Debug.LogWarning("[OverlayManager] No person prefab assigned for this frame.");
                 return;
             }
+            // Long-press toggles between showing the captured frame and a scene-specific character prefab
             if (!isPersonVisible)
             {
-                // 电影帧 → 人物
+                // Movie frame → character overlay transition
                 StartCoroutine(TransitionOverlayToPerson(right, up, forward));
             }
             else
             {
-                // 人物 → 电影帧
+                // Character → movie frame transition
                 StartCoroutine(TransitionPersonToOverlay());
             }
         }
@@ -471,7 +472,9 @@ namespace ARJourneyIntoMovies.AR
             if (cg == null)
                 cg = overlayImage.gameObject.AddComponent<CanvasGroup>();
 
+            // Spawn/activate the character near the camera using a tuned local offset
             SpawnPersonInWorld(right, up, forward);
+            // Start character fully transparent to support fade-in
             Renderer rend = spawnedPerson.GetComponentInChildren<Renderer>();
             Material mat = rend.material;
             Color mc = mat.color; 
@@ -483,10 +486,10 @@ namespace ARJourneyIntoMovies.AR
                 t += Time.deltaTime;
                 float v = t / duration;
 
-                // Overlay 从 1 → 0
+                // Fade overlay out (1 → 0)
                 cg.alpha = Mathf.Lerp(1f, 0f, v);
 
-                // Person 从 0 → 1
+                // Fade character in (0 → 1)
                 mc.a = Mathf.Lerp(0f, 1f, v);
                 mat.color = mc;
 
@@ -509,7 +512,7 @@ namespace ARJourneyIntoMovies.AR
             Material mat = rend.material;
             Color mc = mat.color;
 
-            // 准备 Overlay 重新出现
+            // Prepare overlay to fade back in
             overlayImage.gameObject.SetActive(true);
             CanvasGroup cg = overlayImage.GetComponent<CanvasGroup>();
             if (cg == null)
@@ -521,11 +524,11 @@ namespace ARJourneyIntoMovies.AR
                 t += Time.deltaTime;
                 float v = t / duration;
 
-                // 人物渐隐
+                // Fade character out
                 mc.a = Mathf.Lerp(1f, 0f, v);
                 mat.color = mc;
 
-                // Overlay 渐显
+                // Fade overlay in
                 cg.alpha = Mathf.Lerp(0f, 0.5f, v);
 
                 yield return null;
@@ -542,15 +545,15 @@ namespace ARJourneyIntoMovies.AR
                 return;
             }
 
-            // 克隆
+            // Activate the selected character prefab instance
             spawnedPerson.transform.localScale = new Vector3(
-                -spawnedPerson.transform.localScale.x,   // 镜像翻转
+                -spawnedPerson.transform.localScale.x,   // Mirror on X to fix orientation
                 spawnedPerson.transform.localScale.y,
                 spawnedPerson.transform.localScale.z
             );
             spawnedPerson.SetActive(true);
 
-            // 相机
+            // Place relative to the AR camera (local camera-space offsets)
             Transform cam = Camera.main.transform;
 
             Vector3 newPos =
@@ -560,7 +563,7 @@ namespace ARJourneyIntoMovies.AR
                 cam.forward * forward;
             spawnedPerson.transform.position = newPos;  
 
-            // 让人物保持正面朝向相机（只旋转 Y 轴）
+            // Keep character facing the camera (yaw only)
             Vector3 look = cam.position;
             look.y = spawnedPerson.transform.position.y;
             spawnedPerson.transform.LookAt(look);
@@ -568,9 +571,7 @@ namespace ARJourneyIntoMovies.AR
             Debug.Log("[OverlayManager] Person spawned at local offset (1.47, 0.15, 0.52).");
         }
 
-        // ================================
-        // Control spawned person position
-        // ================================
+        // Control spawned character position (camera-local offsets)
         public void UpdatePersonPosition(float offsetX, float offsetY, float offsetZ)
         {
             if (spawnedPerson == null)
