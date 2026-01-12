@@ -20,9 +20,7 @@ This project was developed as part of the **Mixed Reality** (Fall Semester 2025)
 
 ## 2. Project Organization
 
-This repository contains two main components: a mobile AR application and a
-server-side localization backend. Their responsibilities and interactions are
-summarized below.
+This repository contains two main components: a mobile AR application and a server-side localization backend. Their responsibilities and interactions are summarized below.
 
 ### 2.1 Mobile AR Application (Unity)
 
@@ -67,7 +65,7 @@ AR-Journey-to-Movie/
 │ └── ProjectSettings/
 │
 ├── server/ # Python backend
-│ ├── sfm_models/
+│ ├── sfm_models/ #you can download in [[link](https://polybox.ethz.ch/index.php/s/i2cYKanDZ9AnMow)]
 | ├── HLoc/
 │ ├── query_sfm_pose.py/
 │ ├── utils.py/
