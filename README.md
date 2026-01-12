@@ -47,35 +47,21 @@ summarized below.
 
 ---
 
-## 3. System Overview
-
-The overall system follows a client–server architecture. While the mobile device
-continuously acquires frames and AR poses, the server localizes selected frames in the
-SfM model and estimates the transformation between coordinate systems.
-
-Selected keyframes are processed asynchronously to avoid blocking the user experience.
-The estimated transformation is incrementally refined as more geometrically diverse
-pose pairs become available.
-
-![System Pipeline](README_files/system_pipeline.png)
-
----
-
-## 4. Core User Flow
+## 3. Core Application Flow
 
 1. The user selects a predefined movie scene.
-2. The mobile AR application guides the user to scan the surrounding environment.
+2. The mobile AR application guides the user to specific location by Google Maps and leads the user to scan the surrounding environment.
 3. Camera frames and AR poses are uploaded to the server in the background.
 4. The server localizes selected frames in the SfM model.
 5. A similarity transformation aligns the SfM coordinate system with the AR session.
 6. The original movie frame is overlaid onto the live camera view.
-7. The user captures photos or videos with cinematic alignment.
+7. The user captures photos with cinematic alignment of optional functions (filters, movie characters).
 
-![Core Flow](READEME_files/core_flow.png)
+![Core Flow](core_flow.png)
 
 ---
 
-## 5. Repository Structure
+## 4. Repository Structure
 ```text
 AR-Journey-to-Movie/
 ├── unity-client/ # Unity mobile AR application
