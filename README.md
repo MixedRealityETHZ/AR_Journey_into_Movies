@@ -59,20 +59,88 @@ This repository contains two main components: a mobile AR application and a serv
 ## 4. Repository Structure
 ```text
 AR-Journey-to-Movie/
-├── unity-client/ # Unity mobile AR application
-│ ├── Assets/
-│ ├── Packages/
-│ └── ProjectSettings/
+├── .vscode/                         # VSCode workspace settings
+├── Assets/                          # Unity project assets (scenes, scripts, prefabs, UI, etc.)
+├── Packages/                        # Unity package dependencies
+├── ProjectSettings/                 # Unity project settings
 │
-├── server/ # Python backend
-│ ├── sfm_models/ #you can download in [[link](https://polybox.ethz.ch/index.php/s/i2cYKanDZ9AnMow)]
-| ├── HLoc/
-│ ├── query_sfm_pose.py/
-│ ├── utils.py/
-│ └── server_main.py
+├── Server/                          # Python-based localization server (modified HLoc)
+│   ├── Hierarchical-Localization/   # Vendored HLoc codebase (with project-specific modifications)
+│   ├── query_sfm_pose.py            # Single-image SfM pose query entry (HLoc-based)
+│   ├── server_main.py               # Server entry point (handles requests / threading / pipeline orchestration)
+│   └── utils.py                     # Shared utilities (FPS, conversions and other helpers)
 │
-├── README_files/ # Figures used in README
-└── README.md
+├── core_flow.png                    # Workflow figure used in documentation/poster/README
+├── UpgradeLog.htm                   
+├── MR poster.pdf                    # Course poster 
+├── MR_Midterm_Pre.pdf               # Midterm presentation slides
+├── MR_Proposal_CAI_TANG_PANG_HUANG.pdf
+├── MR_report.pdf                    # Final report
+├── README.md
+└── .gitignore
 ```
 
+## 5. Reproduction Guide
+
+### 5.1 Overview
+
+This project consists of two tightly coupled components:
+
+- **Unity Client**: a mobile AR application responsible for user interaction, frame acquisition, scanning, guiding, and photo capture.
+- **Python Server**: a localization backend based on a **modified HLoc pipeline**, responsible for querying camera poses in pre-built SfM models and returning alignment results in real-time ARKit session.
+
+The Unity application is designed to work **in conjunction with the server**.  
+Without connecting to the server via an HTTPS endpoint, the core localization and alignment workflow cannot be executed.
+
+---
+
+### 5.2 Required SfM Data
+
+The server relies on **pre-built Structure-from-Motion (SfM) reconstructions**.  
+Currently, two real-world scenes are modeled and supported for the app:
+
+- **ETH HG EO-Nord (indoor)**
+- **ETH CAB main entrance (outdoor)**
+
+Due to the large size of the SfM data, these reconstructions are **not included directly in the GitHub repository**.
+
+Please download the SfM models from Polybox:
+
+- **SfM models download**:  
+  https://polybox.ethz.ch/index.php/s/i2cYKanDZ9AnMow
+
+After downloading, place the SfM folders into the directory expected by the server (as referenced in `server_main.py` and `query_sfm_pose.py`).
+
+---
+
+### 5.3 Running the Server (Python Backend)
+
+1. Create and activate a Python environment with the required dependencies:
+   - PyTorch
+   - HLoc and its dependencies
+   - COLMAP / `pycolmap`
+
+2. Ensure the downloaded SfM models are accessible to the server code.
+
+3. Start the localization server:
+   ```bash
+   python Server/server_main.py
+   
+4. Once running, the server will:
+   - receive query frames from the Unity client,
+   - perform SfM-based camera localization using the modified HLoc pipeline,
+   - return pose and alignment results to the client.
+
+
+### 5.4 Running the Unity Client
+
+1. Open the Unity project in Unity Hub.
+2. Configure the server HTTPS URL in the Unity client settings.
+3. Build and deploy the application to a supported mobile AR device.
+4. Follow the in-app workflow as shown in the demo video.
+
+### 5.5 Notes
+  - The Unity client requires an active server connection for smooth operation.
+  - The directory Server/Hierarchical-Localization/ contains a vendored version of HLoc with project-specific modifications.
+  - Without the downloaded SfM data, the server will not be able to perform localization.
 
