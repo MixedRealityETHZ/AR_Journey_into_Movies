@@ -11,7 +11,7 @@ precise cinematic alignment.
 
 The project focuses on robust camera localization, efficient server-side processing, and intuitive AR guidance, demonstrating how computer vision and mobile AR can be combined to bridge film history and physical experience.
 
-You can find the project **paper** here: [[link](https://github.com/fannyrika/MRv2/blob/58b514c78f240ef186558b947fa32b06bcf59626/MR_report.pdf)]  
+You can find the project **paper** here: [[link](https://github.com/MixedRealityETHZ/AR_Journey_into_Movies/blob/main/MR_report.pdf)]  
 You can find the project **demo video** here: [[link](https://drive.google.com/file/d/1Oq_z8GhvoA68HsbQnFUXR84OpYLmLJHK/view?pli=1)]
 
 This project was developed as part of the **Mixed Reality** (Fall Semester 2025) course at ETH Zurich.
